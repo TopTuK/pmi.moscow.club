@@ -35,21 +35,21 @@ If you want to develop something here is instruction how to setup local envirome
           ```sh
           # create db
           $ psql postgres
-          postgres=# createdb vas3k_club
+          postgres=# createdb pmi_club
 
-          # create user (user: vas3k, password: vas3k)
+          # create user (user: pmiclub, password: pmiclub)
           postgres=# createuser --interactive --pwpromp
 
           # grant priviliges
-          postgres=# GRANT ALL PRIVILEGES ON DATABASE vas3k_club TO vas3k;
-          postgres=# \connect vas3k_club
-          postgres=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO vas3k;
-          postgres=# GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to vas3k;
-          postgres=# GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public to vas3k;
+          postgres=# GRANT ALL PRIVILEGES ON DATABASE pmi_club TO pmiclub;
+          postgres=# \connect pmi_club
+          postgres=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO pmiclub;
+          postgres=# GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to pmiclub;
+          postgres=# GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public to pmiclub;
           postgres=# \q
 
           # check connection
-          $ psql -d vas3k_club -U vas3k
+          $ psql -d pmi_club -U pmiclub
           ```
 
   </details>
@@ -119,6 +119,3 @@ To run telegram bot you have to:
       - To get `TELEGRAM_CLUB_CHANNEL_URL`, `TELEGRAM_ADMIN_CHAT_ID` etc Just Simply Forward a message from your group/channel to [@JsonDumpBot](https://t.me/JsonDumpBot) or [@getidsbot](https://t.me/getidsbot)
   3. Rebuild application: `docker-compose up --build`
 
-## Docker-compose
-
-Check out our [docker-compose.yml](https://github.com/toptuk/pmi.moscow.club/blob/master/docker-compose.yml) to understand the infrastructure.
