@@ -3,7 +3,7 @@ ACHIEVEMENTS = [
         "name": "Олды здесь",
         "description": "Почётный ранний член Клуба",
         "image": "https://media.pmi.moscow/a9539ea29ec358403fdf157651bf3b8856a6cfd4624e13c0e9f29afcff2f63b9.png",
-        "style": "color: #FFF; background-color: #65c3ba;",
+        "style": "color: #FFF; background-color: #65C3BA;",
     }),
     ("investor_1000", {
         "name": "Ёрли Инвестор",
