@@ -106,7 +106,7 @@ services:
     restart: always
     user: postgres:postgres
     volumes:
-      - /backup/pmi/pgdata:/backups
+      - /home/pmi-admin/backup/pmi/pgdata:/backups
     links:
       - postgres
     depends_on:
@@ -115,13 +115,15 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=pmi_club
       - POSTGRES_USER=pmiclub
-      - POSTGRES_PASSWORD=pmi_club
+      - POSTGRES_PASSWORD=pmiclub
       - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
       - SCHEDULE=@weekly
       - BACKUP_KEEP_DAYS=7
       - BACKUP_KEEP_WEEKS=4
       - BACKUP_KEEP_MONTHS=6
       - HEALTHCHECK_PORT=8080
+    networks:
+      - club
 
   redis:
     image: redis:alpine
