@@ -104,7 +104,6 @@ services:
   pgbackups:
     image: prodrigestivill/postgres-backup-local
     restart: always
-    user: postgres:postgres
     volumes:
       - /home/pmi-admin/backup/pmi/pgdata:/backups
     links:
