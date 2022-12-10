@@ -62,6 +62,15 @@ TBD: перевести.
 ### 🔮 Простой способ запуска платформы клуба
 Для локальной разработки, тестирования телеграм ботов, запуск платформы без Docker инструкция здесь: [docs/setup.md](docs/setup.md).
 
+### Хочу сделать свой Клуб
+Инструкция по созданию Клуба:
+- https://teletype.in/@toptuk/pmiclub1
+- https://teletype.in/@toptuk/pmiclub2
+- https://teletype.in/@toptuk/pmiclub3
+- https://teletype.in/@toptuk/pmiclub4
+- https://teletype.in/@toptuk/pmiclub5
+- https://teletype.in/@toptuk/pmiclub6
+
 ## 👩‍💼 Лицензия (License)
 
 [MIT](LICENSE)
