@@ -262,17 +262,6 @@
 
                     {% if tag_group.list.0.group == "club" %}
                         <div class="profile-tags-footer">
-                            {% if user.contact %}
-                                <strong>Для связи:</strong> {{ user.contact | urlize }}<br>
-                                {% if user.id != me.id %}
-                                    <small>Не забудьте сказать, что вы из PMI Russia Club</small>
-                                {% endif %}
-                            {% else %}
-                                {% if user.id == me.id %}
-                                    <strong>⚠️ Вы не указали контакт для обратной связи.<br><a href="{% url "edit_profile" user.slug %}#id_contact">Сделайте это здесь</a></strong>
-                                {% endif %}
-                            {% endif %}
-
                             {% if user.id == me.id %}
                                 <small><br>Для абстрактных тегов типа «ищу работу» или «могу научить» не забудьте рассказать подробности в интро. Это поможет другим вас найти!</small>
                             {% endif %}
