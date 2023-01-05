@@ -25,7 +25,7 @@
                             initial-is-voted
                             initial-upvote-timestamp="{{comment.upvoted_at}}"
                          {% endif %}
-                         {% if not me|can_upvote:comment or upvote_disabled %}is-disabled{% endif %}>
+                         {% if not me|can_upvote_comment:comment or upvote_disabled %}is-disabled{% endif %}>
         </comment-upvote>
 
         {% if comment.is_pinned %}
@@ -50,7 +50,7 @@
             <a href="{% url "edit_comment" comment.id %}" class="comment-footer-button comment-button-visible-on-hover"><i class="fas fa-edit"></i></a>
         {% endif %}
 
-        {% if me and comment.post.is_commentable %}
+        {% if me and me.is_active_membership and comment.post.is_commentable %}
             <span class="comment-footer-button" v-on:click="showReplyForm('{{ comment.id }}', '', true)"><i class="fas fa-reply"></i>&nbsp;ответить</span>
         {% endif %}
     </div>

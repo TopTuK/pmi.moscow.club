@@ -89,15 +89,20 @@ class PostForm(forms.ModelForm):
         return topic
 
     def clean_coauthors(self):
-        coathors = self.cleaned_data.get("coauthors")
-        if not coathors:
+        coauthors = self.cleaned_data.get("coauthors")
+        if not coauthors:
             return []
 
-        non_existing_coauthors = [coauthor for coauthor in coathors if not User.objects.filter(slug=coauthor).exists()]
+        seen = set()
+        duplicated_coauthors = [coauthor for coauthor in coauthors if coauthor in seen or seen.add(coauthor)]
+        if duplicated_coauthors:
+            raise ValidationError("Пользователи уже соавторы: {}".format(', '.join(duplicated_coauthors)))
+
+        non_existing_coauthors = [coauthor for coauthor in coauthors if not User.objects.filter(slug=coauthor).exists()]
         if non_existing_coauthors:
             raise ValidationError("Несуществующие пользователи: {}".format(', '.join(non_existing_coauthors)))
 
-        return coathors
+        return coauthors
 
 
 class PostTextForm(PostForm):
@@ -184,7 +189,10 @@ class PostLinkForm(PostForm):
 
         parsed_url = parse_url_preview(cleaned_data.get("url"))
         if parsed_url:
-            self.instance.metadata = dict(parsed_url._asdict())
+            self.instance.metadata = {
+                **(self.instance.metadata or {}),
+                **dict(parsed_url._asdict())
+            }
             self.instance.url = parsed_url.url
             self.instance.image = parsed_url.favicon
 
@@ -386,14 +394,17 @@ class PostEventForm(PostForm):
             raise ValidationError({"event_day": "Несуществующая дата"})
 
         self.instance.metadata = {
-            "event": {
-                "day": cleaned_data["event_day"],
-                "month": cleaned_data["event_month"],
-                "time": str(cleaned_data["event_time"]),
-                "timezone": cleaned_data["event_timezone"],
-                "utc_offset": datetime.now(pytz.timezone(cleaned_data["event_timezone"]))
-                .utcoffset().total_seconds() // 60,
-                "location": cleaned_data["event_location"],
+            **(self.instance.metadata or {}),
+            **{
+                "event": {
+                    "day": cleaned_data["event_day"],
+                    "month": cleaned_data["event_month"],
+                    "time": str(cleaned_data["event_time"]),
+                    "timezone": cleaned_data["event_timezone"],
+                    "utc_offset": datetime.now(pytz.timezone(cleaned_data["event_timezone"]))
+                    .utcoffset().total_seconds() // 60,
+                    "location": cleaned_data["event_location"],
+                }
             }
         }
         return cleaned_data
