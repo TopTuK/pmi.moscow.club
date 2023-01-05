@@ -128,7 +128,7 @@ def upvote_post(request, post_slug):
         "post": {
             "upvotes": post.upvotes + (1 if is_vote_created else 0),
         },
-        "upvoted_timestamp": int(post_vote.created_at.timestamp() * 1000)
+        "upvoted_timestamp": int(post_vote.created_at.timestamp() * 1000) if post_vote else 0
     }
 
 
@@ -169,7 +169,11 @@ def toggle_post_subscription(request, post_slug):
     )
 
     if not is_created:
-        subscription.delete()
+        # already exist? remove it
+        PostSubscription.unsubscribe(
+            user=request.me,
+            post=post,
+        )
 
     return {
         "status": "created" if is_created else "deleted"

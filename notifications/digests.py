@@ -11,6 +11,7 @@ from club.exceptions import NotFound
 from comments.models import Comment, CommentVote
 from common.flat_earth import parse_horoscope
 from landing.models import GodSettings
+from misc.models import ProTip
 from posts.models.post import Post
 from posts.models.votes import PostVote
 from users.models.achievements import UserAchievement
@@ -199,6 +200,7 @@ def generate_weekly_digest(no_footer=False):
         .filter(is_deleted=False)\
         .exclude(post__type=Post.TYPE_BATTLE)\
         .exclude(post__is_visible=False)\
+        .exclude(post__is_approved_by_moderator=False)\
         .exclude(post__is_visible_in_feeds=False)\
         .exclude(id=top_video_comment.id if top_video_comment else None)\
         .order_by("-upvotes")[:3]
@@ -225,6 +227,9 @@ def generate_weekly_digest(no_footer=False):
 
     issue_number = (end_date - settings.LAUNCH_DATE).days // 7
 
+    # Pro tips
+    pro_tip = ProTip.weekly_tip(issue_number)
+
     og_params = urlencode({
         **settings.OG_IMAGE_GENERATOR_DEFAULTS,
         "title": f"Клубный журнал. Итоги недели. Выпуск #{issue_number}.",
@@ -246,6 +251,7 @@ def generate_weekly_digest(no_footer=False):
         "digest_title": digest_title,
         "digest_intro": digest_intro,
         "issue_number": issue_number,
+        "pro_tip": pro_tip,
         "is_footer_excluded": no_footer,
         "og_image_url": f"{settings.OG_IMAGE_GENERATOR_URL}?{og_params}"
     })

@@ -1,6 +1,7 @@
 from django.urls import reverse
 from telegram import Update, ParseMode
 from telegram import Chat as TGChat
+from telegram import Chat as TGChat
 from telegram.ext import CallbackContext
 
 from bot.decorators import is_club_member
