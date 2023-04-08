@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import F
+from django.urls import reverse
 
 from users.models.geo import Geo
 from common.models import ModelDiffMixin
@@ -115,6 +116,9 @@ class User(models.Model, ModelDiffMixin):
     class Meta:
         db_table = "users"
 
+    def __str__(self):
+        return f"User: {self.slug}"
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(User, self.full_name, separator="")
@@ -144,6 +148,9 @@ class User(models.Model, ModelDiffMixin):
             "country": self.country,
             "is_active_member": self.is_active_member,
         }
+
+    def get_absolute_url(self):
+        return reverse("profile", kwargs={"user_slug": self.slug})
 
     def update_last_activity(self):
         now = datetime.utcnow()
