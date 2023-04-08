@@ -77,15 +77,6 @@ def network_chat(request, chat_id):
 
 @require_GET
 def robots(request):
-    # lines = [
-    #    "User-agent: *",
-    #    "Sitemap: https://vas3k.club/sitemap.xml",
-    #    "Host: https://vas3k.club",
-    #    "Disallow: /intro/",
-    #    "Disallow: /user/",
-    #    "Disallow: /people/",
-    #    "Clean-param: comment_order&goto /",
-    # ]
     lines = [
         "User-agent: *",
         "Sitemap: https://pmi.moscow/sitemap.xml",
