@@ -141,7 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "frontend/static")]
 REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
 REDIS_PORT = os.getenv("REDIS_PORT") or 6379
 Q_CLUSTER = {
-    "name": "vas3k_club",
+    "name": "pmi_club",
     "workers": 4,
     "recycle": 500,
     "timeout": 30,
@@ -304,7 +304,7 @@ MODERATOR_USERNAME = "moderator"
 DELETED_USERNAME = "deleted"
 
 
-VALUES_GUIDE_URL = "https://pmi.moscow/post/values/"
+VALUES_GUIDE_URL = "https://pmi.moscow/post/103/"
 POSTING_GUIDE_URL = "https://pmi.moscow/post/9/"
 CHATS_GUIDE_URL = "https://pmi.moscow/post/12/"
 PEOPLE_GUIDE_URL = "https://pmi.moscow/post/13/"
