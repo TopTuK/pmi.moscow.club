@@ -141,7 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "frontend/static")]
 REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
 REDIS_PORT = os.getenv("REDIS_PORT") or 6379
 Q_CLUSTER = {
-    "name": "pmi_club",
+    "name": "vas3k_club",
     "workers": 4,
     "recycle": 500,
     "timeout": 30,
