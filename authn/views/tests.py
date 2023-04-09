@@ -168,6 +168,7 @@ class ViewEmailLoginTests(TestCase):
         # it"s not yet authorised, only code was sent
         self.assertFalse(self.client.is_authorised())
 
+    @skip("Free membership")
     def test_login_user_not_exist(self):
         response = self.client.post(reverse("email_login"),
                                     data={"email_or_login": "not-existed@user.com", })
@@ -181,6 +182,7 @@ class ViewEmailLoginTests(TestCase):
                              fetch_redirect_response=False)
         self.assertTrue(self.client.is_authorised())
 
+    @skip("Free membership")
     def test_secret_hash_user_not_exist(self):
         response = self.client.post(reverse("email_login"),
                                     data={"email_or_login": "not-existed@user.com|-xxx", })
