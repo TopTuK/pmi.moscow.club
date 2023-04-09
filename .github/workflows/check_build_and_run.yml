@@ -1,8 +1,6 @@
 name: Check it could be build and run from scratch
 
-on:
-  pull_request:
-    branches: master
+on: [pull_request]
 
 jobs:
   dockerize:
