@@ -115,4 +115,10 @@ ACHIEVEMENTS = [
         "image": "https://media.pmi.moscow/41c3356c4bac66907f414317ab19a282bdb96b49348cd04cb35f842195792405.jpe",
         "style": "background-color: #ffce30;",
     }),
+    ("astrophoto", {
+        "name": "Космо-папарации",
+        "description": "За участие в мероприятии астрофотографов",
+        "image": "https://vas3k.club/static/images/achievements/astrophoto.png",
+        "style": "background-color: #200836; font-size: 120%;",
+    }),
 ]

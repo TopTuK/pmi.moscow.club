@@ -12,9 +12,7 @@ from users.models.user import User
 COMMENT_EMOJI_RE = re.compile(r"^💬.*")
 POST_EMOJI_RE = re.compile(r"^[📝🔗❓💡🏢🤜🤛🗺🗄🔥🏗🙋‍♀️].*")
 
-# COMMENT_URL_RE = re.compile(r"https?://vas3k.club/[a-zA-Z]+/.+?/#comment-([a-fA-F0-9\-]+)")
 COMMENT_URL_RE = re.compile(r"https?://pmi.moscow/[a-zA-Z]+/.+?/#comment-([a-fA-F0-9\-]+)")
-#POST_URL_RE = re.compile(r"https?://vas3k.club/[a-zA-Z]+/(.+?)/")
 POST_URL_RE = re.compile(r"https?://pmi.moscow/[a-zA-Z]+/(.+?)/")
 
 log = logging.getLogger(__name__)
@@ -49,7 +47,7 @@ def get_club_user(update: Update):
     user = User.objects.filter(telegram_id=update.effective_user.id).first()
     if not user:
         if update.callback_query:
-            update.callback_query(text=f"☝️ Привяжи бота к профилю, братишка")
+            update.callback_query.answer(text=f"☝️ Привяжи бота к профилю, братишка")
         else:
             update.message.reply_text(
                 f"😐 Привяжи <a href=\"https://pmi.moscow/user/me/edit/bot/\">бота</a> к профилю, братишка",
@@ -59,14 +57,14 @@ def get_club_user(update: Update):
 
     if user.is_banned:
         if update.callback_query:
-            update.callback_query(text=f"🙈 Ты в бане, мы больше не дружим")
+            update.callback_query.answer(text=f"🙈 Ты в бане, мы больше не дружим")
         else:
             update.message.reply_text(f"🙈 Ты в бане, мы больше не дружим")
         return None
 
     if not user.is_member:
         if update.callback_query:
-            update.callback_query(text=f"😣 Твой профиль в Клубе неактивен. Плоти долор!")
+            update.callback_query.answer(text=f"😣 Твой профиль в Клубе неактивен. Плоти долор!")
         else:
             update.message.reply_text(f"😣 Твой профиль в Клубе неактивен. Плоти долор!")
         return None
