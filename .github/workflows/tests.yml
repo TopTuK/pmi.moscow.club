@@ -1,10 +1,10 @@
-name: Run tests
+name: Run integration tests
 
 on:
-  pull_request:
   push:
     branches:
       - master
+  pull_request:
 
 concurrency:
   # For pull requests, cancel all currently-running jobs for this workflow
@@ -16,7 +16,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         id: setup-python
         with:
@@ -25,7 +27,6 @@ jobs:
       - name: Install requirements
         run: |
           pip install --no-cache-dir flake8
-
       - name: run flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -58,10 +59,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         id: setup-python
         with:
           python-version: '3.8'
+          
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
