@@ -1,4 +1,4 @@
-name: Deploy production
+name: Deploy production to server
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - run: docker image push ghcr.io/toptuk/pmiclub:latest
 
   deploy:
-    name: Deploy pmi club
+    name: Deploy PMI club
     runs-on: ubuntu-latest
     needs: build
     env:

@@ -3,19 +3,20 @@ from urllib.parse import urlencode
 
 import pytz
 from django.db.models import Count, Q, Sum
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_GET
 from icalendar import Calendar, Event
 
-from auth.helpers import auth_required
+from authn.decorators.auth import require_auth
 from badges.models import UserBadge
 from landing.models import GodSettings
+from misc.models import NetworkGroup, NetworkItem
 from users.models.achievements import Achievement
 from users.models.user import User
 
 
-@auth_required
+@require_auth
 def stats(request):
     achievements = Achievement.objects\
         .annotate(user_count=Count('users'))\
@@ -58,25 +59,24 @@ def stats(request):
     })
 
 
-@auth_required
+@require_auth
 def network(request):
-    secret_page_html = GodSettings.objects.first().network_page
+    network_groups = NetworkGroup.visible_objects()
     return render(request, "pages/network.html", {
-        "page_html": secret_page_html,
+        "network": network_groups,
     })
+
+
+@require_auth
+def network_chat(request, chat_id):
+    network_item = get_object_or_404(NetworkItem, id=chat_id)
+    if not network_item.url:
+        raise Http404()
+    return redirect(network_item.url, permanent=False)
 
 
 @require_GET
 def robots(request):
-    # lines = [
-    #    "User-agent: *",
-    #    "Sitemap: https://vas3k.club/sitemap.xml",
-    #    "Host: https://vas3k.club",
-    #    "Disallow: /intro/",
-    #    "Disallow: /user/",
-    #    "Disallow: /people/",
-    #    "Clean-param: comment_order&goto /",
-    # ]
     lines = [
         "User-agent: *",
         "Sitemap: https://pmi.moscow/sitemap.xml",
@@ -89,7 +89,7 @@ def robots(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
-@auth_required
+@require_auth
 def generate_ical_invite(request):
     event_title = request.GET.get("title")
     event_date = request.GET.get("date")
@@ -121,7 +121,7 @@ def generate_ical_invite(request):
     return response
 
 
-@auth_required
+@require_auth
 def generate_google_invite(request):
     event_title = request.GET.get("title")
     event_date = request.GET.get("date")

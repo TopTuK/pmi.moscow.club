@@ -3,11 +3,11 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 
-from auth.helpers import auth_required
+from authn.decorators.auth import require_auth
 from badges.models import UserBadge
 from comments.models import Comment
 from common.pagination import paginate
-from common.request import ajax_request
+from authn.decorators.api import api
 from posts.models.post import Post
 from search.models import SearchIndex
 from users.forms.profile import ExpertiseForm
@@ -16,11 +16,12 @@ from users.models.expertise import UserExpertise
 from users.models.friends import Friend
 from users.models.mute import Muted
 from tags.models import Tag, UserTag
+from users.models.notes import UserNote
 from users.models.user import User
 from users.utils import calculate_similarity
 
 
-@auth_required
+@require_auth
 def profile(request, user_slug):
     if user_slug == "me":
         return redirect("profile", request.me.slug, permanent=False)
@@ -64,6 +65,14 @@ def profile(request, user_slug):
         .order_by("-published_at")
     friend = Friend.objects.filter(user_from=request.me, user_to=user).first()
     muted = Muted.objects.filter(user_from=request.me, user_to=user).first()
+    note = UserNote.objects.filter(user_from=request.me, user_to=user).first()
+
+    moderator_notes = []
+    if request.me.is_moderator:
+        moderator_notes = UserNote.objects.filter(user_to=user)\
+            .exclude(user_from=request.me)\
+            .select_related("user_from")\
+            .all()
 
     return render(request, "users/profile.html", {
         "user": user,
@@ -82,10 +91,12 @@ def profile(request, user_slug):
         "similarity": similarity,
         "friend": friend,
         "muted": muted,
+        "note": note,
+        "moderator_notes": moderator_notes,
     })
 
 
-@auth_required
+@require_auth
 def profile_comments(request, user_slug):
     if user_slug == "me":
         return redirect("profile_comments", request.me.slug, permanent=False)
@@ -103,7 +114,7 @@ def profile_comments(request, user_slug):
     })
 
 
-@auth_required
+@require_auth
 def profile_posts(request, user_slug):
     if user_slug == "me":
         return redirect("profile_posts", request.me.slug, permanent=False)
@@ -122,7 +133,7 @@ def profile_posts(request, user_slug):
     })
 
 
-@auth_required
+@require_auth
 def profile_badges(request, user_slug):
     if user_slug == "me":
         return redirect("profile_badges", request.me.slug, permanent=False)
@@ -137,8 +148,7 @@ def profile_badges(request, user_slug):
     })
 
 
-@auth_required
-@ajax_request
+@api(require_auth=True)
 def toggle_tag(request, tag_code):
     if request.method != "POST":
         raise Http404()
@@ -160,8 +170,7 @@ def toggle_tag(request, tag_code):
     }
 
 
-@auth_required
-@ajax_request
+@api(require_auth=True)
 def add_expertise(request):
     if request.method == "POST":
         form = ExpertiseForm(request.POST)
@@ -185,8 +194,7 @@ def add_expertise(request):
     return {"status": "ok"}
 
 
-@auth_required
-@ajax_request
+@api(require_auth=True)
 def delete_expertise(request, expertise):
     if request.method == "POST":
         UserExpertise.objects.filter(user=request.me, expertise=expertise).delete()

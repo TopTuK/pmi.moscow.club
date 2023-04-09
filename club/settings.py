@@ -23,11 +23,16 @@ ADMINS = [
 ]
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.contrib.sitemaps",
     "club",
-    "auth.apps.AuthConfig",
+    "authn.apps.AuthnConfig",
     "bookmarks.apps.BookmarksConfig",
     "comments.apps.CommentsConfig",
     "landing.apps.LandingConfig",
@@ -47,6 +52,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "club.middleware.me",
     "club.middleware.ExceptionMiddleware",
@@ -66,10 +75,12 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
+                "django.contrib.auth.context_processors.auth",
                 "club.context_processors.settings_processor",
                 "club.context_processors.data_processor",
                 "club.context_processors.features_processor",
-                "auth.context_processors.users.me",
+                "authn.context_processors.users.me",
                 "posts.context_processors.topics.topics",
             ]
         },
@@ -130,7 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "frontend/static")]
 REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
 REDIS_PORT = os.getenv("REDIS_PORT") or 6379
 Q_CLUSTER = {
-    "name": "vas3k_club",
+    "name": "pmi_club",
     "workers": 4,
     "recycle": 500,
     "timeout": 30,
@@ -214,7 +225,7 @@ PATREON_GOD_IDS = ["8724543"]
 COINBASE_CHECKOUT_ENDPOINT = "https://commerce.coinbase.com/checkout/"
 COINBASE_WEBHOOK_SECRET = os.getenv("COINBASE_WEBHOOK_SECRET")
 
-JWT_PRIVATE_KEY = os.getenv("JWT_PRIVATE_KEY")
+JWT_PRIVATE_KEY = (os.getenv("JWT_PRIVATE_KEY") or "").replace("\\n", "\n")
 JWT_PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA03rHsNGQ3HUfHIqSYXCh
 dCAl8S4hlhCwNK7OPqh7oWVW8O/UFMqdQ1OMxb95iTIDx/as65crXVFx6X/PWBkx
@@ -229,7 +240,12 @@ FrszQVIzss9rVZWGHBX0IihkBHkUpPgtzulzk3LzWpr7bsRqW+lHeLdUCqNE35k5
 pDj7UCL9iaN+xZdV4IULs3OvwLY+iuVKQR/Ja5lnyazAMZHBjIDBejHd/3hXlUBL
 BbPun08UBA4T4QntAsUVfvsCAwEAAQ==
 -----END PUBLIC KEY-----"""
-JWT_ALGORITHM = "RS256"
+
+OPENID_JWT_ALGORITHM = "RS256"
+OPENID_JWT_EXPIRE_SECONDS = 24 * 60 * 60  # 24 hours
+OPENID_CODE_EXPIRE_SECONDS = 300  # 5 minutes
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 MEDIA_UPLOAD_URL = "https://media.pmi.moscow/upload/multipart/"
 MEDIA_UPLOAD_CODE = os.getenv("MEDIA_UPLOAD_CODE")
@@ -287,6 +303,8 @@ CLEARED_POST_TEXT = "```\n" \
 MODERATOR_USERNAME = "moderator"
 DELETED_USERNAME = "deleted"
 
+
+VALUES_GUIDE_URL = "https://pmi.moscow/post/103/"
 POSTING_GUIDE_URL = "https://pmi.moscow/post/9/"
 CHATS_GUIDE_URL = "https://pmi.moscow/post/12/"
 PEOPLE_GUIDE_URL = "https://pmi.moscow/post/13/"
