@@ -27,7 +27,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # render digest using a special html endpoint
         try:
-            digest, _ = generate_weekly_digest()
+            digest_template, _ = generate_weekly_digest()
         except NotFound:
             log.error("Weekly digest is empty")
             return
@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 is_pinned_until=datetime.utcnow() + timedelta(days=1),
                 is_visible=True,
                 is_public=False,
-                metadata={"og_description" : og_description},
+                metadata={"og_description": og_description},
             )
         )
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                digest = digest\
+                digest = digest_template\
                     .replace("%username%", user.slug)\
                     .replace("%user_id%", str(user.id))\
                     .replace("%secret_code%", base64.b64encode(user.secret_hash.encode("utf-8")).decode())
