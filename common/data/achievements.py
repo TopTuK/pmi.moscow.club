@@ -121,4 +121,34 @@ ACHIEVEMENTS = [
         "image": "https://vas3k.club/static/images/achievements/astrophoto.png",
         "style": "background-color: #200836; font-size: 120%;",
     }),
+    ("music_jam_4", {
+        "name": "OSTallenge",
+        "description": "За участие в весеннем OSTэллендже 2023",
+        "image": "https://vas3k.club/static/images/achievements/ost-achievement.png",
+        "style": "background-color: #4996FF; font-size: 120%;",
+    }),
+    ("cake_is_a_lie", {
+        "name": "The cake is a lie",
+        "description": "За победу над Безумной Машиной в Квесте",
+        "image": "https://vas3k.club/static/images/achievements/cake_is_a_lie.png",
+        "style": "background-color: #FF7400; font-size: 120%;",
+    }),
+    ("botmom", {
+        "name": "BotMother",
+        "description": "За создание бота для клубного чата",
+        "image": "https://vas3k.club/static/images/achievements/botmom.png",
+        "style": "background-color: #002C35; font-size: 120%;",
+    }),
+    ("diy_challenge_1", {
+        "name": "Самоделкин",
+        "description": "За участие в одном DIY челлендже",
+        "image": "https://vas3k.club/static/images/achievements/diy_challenge_1.png",
+        "style": "background-color: #C9C097; font-size: 120%;",
+    }), 
+    ("diy_challenge_2", {
+        "name": "Мастер на все руки",
+        "description": "За участие в 4 DIY челленджах",
+        "image": "https://vas3k.club/static/images/achievements/diy_challenge_2.png",
+        "style": "background-color: #C9C097; font-size: 120%;",
+    }),
 ]

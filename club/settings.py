@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "gdpr.apps.GdprConfig",
     "badges.apps.BadgesConfig",
     "tags.apps.TagsConfig",
+    "rooms.apps.RoomsConfig",
     "misc.apps.MiscConfig",
     "simple_history",
     "django_q",
@@ -81,7 +82,7 @@ TEMPLATES = [
                 "club.context_processors.data_processor",
                 "club.context_processors.features_processor",
                 "authn.context_processors.users.me",
-                "posts.context_processors.topics.topics",
+                "posts.context_processors.rooms.rooms",
             ]
         },
     }
@@ -220,7 +221,6 @@ PATREON_CLIENT_SECRET = os.getenv("PATREON_CLIENT_SECRET") or ""
 
 PATREON_REDIRECT_URL = f"{APP_HOST}/auth/patreon_callback/"
 PATREON_SCOPE = "identity identity[email]"
-PATREON_GOD_IDS = ["8724543"]
 
 COINBASE_CHECKOUT_ENDPOINT = "https://commerce.coinbase.com/checkout/"
 COINBASE_WEBHOOK_SECRET = os.getenv("COINBASE_WEBHOOK_SECRET")
@@ -293,7 +293,7 @@ POST_VIEW_COOLDOWN_PERIOD = timedelta(days=1)  # how much time must pass before 
 POST_HOTNESS_PERIOD = timedelta(days=5)  # time window for hotness recalculation script
 MAX_COMMENTS_FOR_DELETE_VS_CLEAR = 10  # number of comments after which the post cannot be deleted
 MIN_DAYS_TO_GIVE_BADGES = 35  # minimum "days" balance to buy and gift any badge
-MAX_MUTE_COUNT = 10  # maximum number of users allowed to mute
+MAX_MUTE_COUNT = 15  # maximum number of users allowed to mute
 CLEARED_POST_TEXT = "```\n" \
     "😥 Этот пост был удален самим автором и от него остались лишь комментарии участников. " \
     "Если вы хотите приютить и развить эту тему как новый автор, напишите модераторам Клуба: moderator@pmi.moscow" \

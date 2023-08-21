@@ -19,7 +19,7 @@
             {% if post.is_pinned %}<i class="fas fa-thumbtack"></i>{% endif %}
 
             <span class="p-name">
-                📅 <a href="{% url "show_post" post.type post.slug %}" class="post-title-link">{{ post.title | rutypography }}</a>
+                <a href="{% url "show_post" post.type post.slug %}" class="post-title-link">{{ post.title | rutypography }}</a>
             </span>
 
             {% if post.label %}
@@ -46,9 +46,9 @@
     </div>
 
     <div class="feed-post-footer">
-        {% if post.topic %}
-            <span class="feed-post-topic">
-                {% include "posts/widgets/topic.html" with topic=post.topic type="inline" %}
+        {% if post.room %}
+            <span class="feed-post-room">
+                {% include "rooms/widgets/room.html" with room=post.room type="inline" %}
             </span>
         {% endif %}
 
