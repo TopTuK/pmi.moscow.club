@@ -12,7 +12,7 @@ from authn.views.email import email_login, email_login_code
 from authn.views.external import external_login
 from authn.views.openid import openid_authorize, openid_issue_token, openid_revoke_token, \
     openid_well_known_configuration, openid_well_known_jwks
-from authn.views.patreon import patreon_login, patreon_oauth_callback
+from authn.views.patreon import patreon_sync, patreon_sync_callback
 from badges.views import create_badge_for_post, create_badge_for_comment
 from club import features
 from comments.api import api_list_post_comments
@@ -21,7 +21,8 @@ from comments.views import create_comment, edit_comment, delete_comment, show_co
 from common.feature_flags import feature_switch
 from landing.views import landing, docs, godmode_network_settings, godmode_digest_settings, godmode_settings, \
     godmode_invite
-from misc.views import stats, network, robots, generate_ical_invite, generate_google_invite, network_chat
+from misc.views import stats, network, robots, generate_ical_invite, generate_google_invite
+from rooms.views import redirect_to_room_chat, list_rooms
 from notifications.views import render_weekly_digest, email_unsubscribe, email_confirm, render_daily_digest, \
     email_digest_switch, link_telegram
 from notifications.webhooks import webhook_event
@@ -73,8 +74,8 @@ urlpatterns = [
     path("join/", join, name="join"),
     path("auth/login/", login, name="login"),
     path("auth/logout/", logout, name="logout"),
-    path("auth/patreon/", patreon_login, name="patreon_login"),
-    path("auth/patreon_callback/", patreon_oauth_callback, name="patreon_oauth_callback"),
+    path("auth/patreon/", patreon_sync, name="patreon_sync"),
+    path("auth/patreon_callback/", patreon_sync_callback, name="patreon_sync_callback"),
     path("auth/email/", email_login, name="email_login"),
     path("auth/email/code/", email_login_code, name="email_login_code"),
     path("auth/external/", external_login, name="external_login"),
@@ -156,8 +157,10 @@ urlpatterns = [
     path("search/users.json", api_search_users, name="api_search_users"),
     path("search/tags.json", api_search_tags, name="api_search_tags"),
 
-    path("room/<slug:topic_slug>/", feed, name="feed_topic"),
-    path("room/<slug:topic_slug>/<slug:ordering>/", feed, name="feed_topic_ordering"),
+    path("rooms/", list_rooms, name="list_rooms"),
+    path("room/<slug:room_slug>/", feed, name="feed_room"),
+    path("room/<slug:room_slug>/chat/", redirect_to_room_chat, name="redirect_to_room_chat"),
+    path("room/<slug:room_slug>/<slug:ordering>/", feed, name="feed_room_ordering"),
     path("label/<slug:label_code>/", feed, name="feed_label"),
     path("label/<slug:label_code>/<slug:ordering>/", feed, name="feed_label_ordering"),
 
@@ -183,7 +186,8 @@ urlpatterns = [
     path("docs/<slug:doc_slug>/", docs, name="docs"),
 
     path("network/", network, name="network"),
-    path("network/chat/<slug:chat_id>/", network_chat, name="network_chat"),
+    path("network/chat/<slug:chat_id>/", RedirectView.as_view(url="/room/%(chat_id)s/chat/", permanent=True),
+         name="network_chat"),
 
     # admin features
     path("godmode/", godmode_settings, name="godmode_settings"),
