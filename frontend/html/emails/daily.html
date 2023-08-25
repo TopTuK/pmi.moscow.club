@@ -5,7 +5,7 @@
 {% load emails %}
 
 {% block og_meta %}
-    <meta property="og:site_name" content="PMI Russia Club" />
+    <meta property="og:site_name" content="PM Russia Club" />
     <meta property="og:title" content="Ежедневный дайджест" />
     <meta property="og:type" content="article" />
     <meta property="og:description" content="Подборка событий в Клубе за день, составленная нашей бездушной, но очень вежливой машиной специально для вас." />
@@ -178,7 +178,7 @@
         <h2>✨ Гороскоп в конце</h2>
 
         <p class="editorial">
-            {% if moon_phase.club_day %}Сегодня {{ moon_phase.club_day }} день от сотворения PMI Russia Club{% endif %}{% if moon_phase.phase_num %} и {{ moon_phase.phase_num }}{% endif %}.
+            {% if moon_phase.club_day %}Сегодня {{ moon_phase.club_day }} день от сотворения PM Russia Club{% endif %}{% if moon_phase.phase_num %} и {{ moon_phase.phase_num }}{% endif %}.
             {% if moon_phase.phase_sign %}{{ moon_phase.phase_sign | capfirst }}.{% endif %}
         </p>
 
