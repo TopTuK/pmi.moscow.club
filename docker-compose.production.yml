@@ -38,6 +38,10 @@ services:
     networks:
       - front
       - club
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
 
   queue:
     <<: *app
@@ -49,6 +53,10 @@ services:
     ports: []
     networks:
       - club
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
 
   bot:
     <<: *app
@@ -73,6 +81,10 @@ services:
       - "8816:8816"
     networks:
       - club
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
 
   cron:
     <<: *app
@@ -85,6 +97,10 @@ services:
     ports: []
     # networks:
     #   - club
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
 
   postgres:
     image: postgres:12
