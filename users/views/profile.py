@@ -28,9 +28,6 @@ def profile(request, user_slug):
 
     user = get_object_or_404(User, slug=user_slug)
 
-    if not user.can_view(request.me):
-        return render(request, "auth/private_profile.html")
-
     if request.me and user.id == request.me.id:
         # handle auth redirect
         goto = request.GET.get("goto")
@@ -42,9 +39,13 @@ def profile(request, user_slug):
         if access_denied:
             return access_denied
 
-    if user.moderation_status != User.MODERATION_STATUS_APPROVED and not request.me.is_moderator:
-        # hide unverified users
-        raise Http404()
+    if not user.can_view(request.me):
+        return render(request, "auth/private_profile.html")
+
+    if user.moderation_status != User.MODERATION_STATUS_APPROVED:
+        # hide unverified users (but still show to moderators)
+        if not request.me or not request.me.is_moderator:
+            raise Http404()
 
     # select user tags and calculate similarity with me
     tags = Tag.objects.filter(is_visible=True).exclude(group=Tag.GROUP_COLLECTIBLE).all()
