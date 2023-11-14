@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 TELEGRAM_CHANNEL_ID = -1001814814883
 TIME_INTERVAL = timedelta(days=4)
 LIMIT = 40
-MIN_UPVOTES = 20
+MIN_UPVOTES = 25
 
 
 class Command(BaseCommand):
@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
         comments_with_badges = [b.comment for b in new_badges]
 
-        for comment in list(comments_with_badges) + list(best_comments):
+        for comment in list(best_comments) + list(comments_with_badges):
             if not comment.metadata or not comment.metadata.get("in_best_comments"):
                 self.stdout.write(f"Comment {comment.id} +{comment.upvotes}")
                 comment.metadata = comment.metadata or {}
