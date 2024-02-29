@@ -91,6 +91,30 @@ ACHIEVEMENTS = [
         "image": "https://media.pmi.moscow/f408eaea2afe4c1d1dc7a69da59fc76afa1ce2d285cd274a978937484b9ddda8.png",
         "style": "background-color: #F04393; font-size: 100%;",
     }),
+    ("2020", {
+        "name": "2020",
+        "description": "Призовое место в итогах 2020 года",
+        "image": "https://vas3k.club/static/images/achievements/2020.png",
+        "style": "background-color: #FC913A; font-size: 190%;",
+    }),
+    ("2021", {
+        "name": "2021",
+        "description": "Призовое место в итогах 2021 года",
+        "image": "https://vas3k.club/static/images/achievements/2021.png",
+        "style": "background-color: #6667AB; font-size: 190%;",
+    }),
+    ("2022", {
+        "name": "2022",
+        "description": "Призовое место в итогах 2022 года",
+        "image": "https://vas3k.club/static/images/achievements/2022.png",
+        "style": "background-color: #BE3435; font-size: 190%;",
+    }),
+    ("2023", {
+        "name": "2023",
+        "description": "Призовое место в итогах 2023 года",
+        "image": "https://vas3k.club/static/images/achievements/2023.png",
+        "style": "background-color: #f87c56; font-size: 190%;",
+    }),
     ("mic", {
         "name": "Золотой микрофон",
         "description": "За выступление на АМА  и митапах в качестве оратора",
@@ -151,4 +175,30 @@ ACHIEVEMENTS = [
         "image": "https://vas3k.club/static/images/achievements/diy_challenge_2.png",
         "style": "background-color: #C9C097; font-size: 120%;",
     }),
+    ("music_jam_5", {
+        "name": "Mashmer",
+        "description": "За участие в летнем музыкальном челлендже 2023",
+        "image": "https://vas3k.club/static/images/achievements/mashmer.png",
+        "style": "background-color: #3320A0; font-size: 120%;",
+    }),
+    ("dota_winner_1", {
+        "name": "Дотер 2 уровня",
+        "description": "За взятие призового места в кибертурнире по Dota2",
+        "image": "https://vas3k.club/static/images/achievements/dota_winner_1.png",
+        "style": "background-color: #000000; font-size: 120%;",
+    }),
+    ("cs_winner_1", {
+        "name": "Pew-pew mfs",
+        "description": "За взятие призового места в кибертурнире по CS",
+        "image": "https://vas3k.club/static/images/achievements/cs_winner_1.png",
+        "style": "background-color: #FFA300; font-size: 120%;",
+    }),
+    ("game_tournament_org_1", {
+        "name": "Королевская клешня",
+        "description": "За участие в киберспортивном турнире",
+        "image": "https://vas3k.club/static/images/achievements/game_tournament_org_1.png",
+        "style": "background-color: #929292; font-size: 120%;",
+    }),
 ]
+
+# VIP: https://i.vas3k.club/3cb.png
