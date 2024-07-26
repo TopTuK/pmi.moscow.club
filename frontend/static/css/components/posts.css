@@ -212,6 +212,19 @@
         max-width: 100%;
     }
 
+    .post-project-image .post-image {
+        padding-top: 0;
+        margin-bottom: 30px;
+        max-height: none;
+    }
+
+    .post-project-link {
+        font-size: 180%;
+        font-weight: 600;
+        word-break: break-all;
+        overflow: hidden;
+    }
+
 .text-body {
     position: relative;
     font-style: normal;
@@ -993,6 +1006,15 @@
                 margin-right: -10px;
             }
         }
+
+    .battle-comments-list {
+        display: grid;
+        grid-template-columns: 10% 1fr 10%;
+        grid-template-areas:
+            "prefix prefix prefix"
+            "left center right"
+            "replies replies replies"
+    }
 
     .post-comments-form {
         padding-top: 30px;

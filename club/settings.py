@@ -1,5 +1,4 @@
 import os
-import random
 from datetime import timedelta, datetime
 
 import sentry_sdk
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     "simple_history",
     "django_q",
     "webpack_loader",
+    "helpdeskbot.apps.HelpDeskBotConfig",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +69,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             os.path.join(BASE_DIR, "notifications/telegram/templates"),
+            os.path.join(BASE_DIR, "helpdeskbot/templates"),
             os.path.join(BASE_DIR, "frontend/html"),
         ],
         "APP_DIRS": True,
@@ -79,7 +80,6 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django.contrib.auth.context_processors.auth",
                 "club.context_processors.settings_processor",
-                "club.context_processors.data_processor",
                 "club.context_processors.features_processor",
                 "authn.context_processors.users.me",
                 "posts.context_processors.rooms.rooms",

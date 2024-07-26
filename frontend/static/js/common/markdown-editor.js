@@ -1,4 +1,5 @@
 import EasyMDE from "easymde";
+import { findParentForm, isCommunicationForm } from "./utils";
 
 const defaultMarkdownEditorOptions = {
     autoDownloadFontAwesome: false,
@@ -69,6 +70,17 @@ export const imageUploadOptions = {
     },
 };
 
+export function createFileInput({ allowedTypes = [] }) {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.name = "attach-image"
+    if (allowedTypes) {
+        fileInput.accept = allowedTypes.join();
+    }
+
+    return fileInput;
+}
+
 export function handleFormSubmissionShortcuts(event) {
     const isEnter = event.key === "Enter";
     const isCtrlOrCmd = event.ctrlKey || event.metaKey;
@@ -77,7 +89,7 @@ export function handleFormSubmissionShortcuts(event) {
         return;
     }
 
-    const form = findParentForm(e.target);
+    const form = findParentForm(event.target);
     if (!form || !isCommunicationForm(form)) {
         return;
     }
