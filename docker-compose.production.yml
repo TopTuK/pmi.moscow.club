@@ -96,6 +96,8 @@ services:
       - redis
     ports:
       - "8817:8817"
+    networks:
+      - club
     logging:
       driver: "json-file"
       options:
