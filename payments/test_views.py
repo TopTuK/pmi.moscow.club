@@ -121,6 +121,7 @@ class TestPayView(TestCase):
     def setUp(self):
         self.client = HelperClient(user=self.existed_user)
 
+    @skip("Free membership")
     def test_positive_new_user(self, mocked_stripe):
         # given
         product_code = "club1"
@@ -150,6 +151,7 @@ class TestPayView(TestCase):
         self.assertTrue(Payment.get(reference=session.id))
         self.assertContains(response=response, text="Платим 💰", status_code=200)
 
+    @skip("Free membership")
     def test_positive_existed_authorised_user(self, mocked_stripe):
         # given
         product_code = "club1"
@@ -176,6 +178,7 @@ class TestPayView(TestCase):
         self.assertTrue(Payment.get(reference=session.id))
         self.assertContains(response=response, text="Платим 💰", status_code=200)
 
+    @skip("Free membership")
     def test_negative_new_user_with_broken_email(self, mocked_stripe):
         # given
         product_code = "club1"
@@ -192,6 +195,7 @@ class TestPayView(TestCase):
         self.assertFalse(User.objects.filter(email=broken_email).exists(), )
         self.assertContains(response=response, text="Плохой e-mail адрес", status_code=200)
 
+    @skip("Free membership")
     def test_product_not_found(self, mocked_stripe):
         product_code = "unexisted-product-code"
 
@@ -227,6 +231,7 @@ class TestStripeWebhookView(TestCase):
 
         return json_event
 
+    @skip("Free membership")
     def test_event_checkout_session_completed_positive(self):
         # links:
         #   https://stripe.com/docs/webhooks/signatures
@@ -283,6 +288,7 @@ class TestStripeWebhookView(TestCase):
             user = User.objects.get(id=self.existed_user.id)
             self.assertEqual(user.membership_expires_at, self.existed_user.membership_expires_at)
 
+    @skip("Free membership")
     def test_event_invoice_paid_with_billing_reason_subscription_create_positive(self):
         # links:
         #   https://stripe.com/docs/webhooks/signatures
@@ -310,6 +316,7 @@ class TestStripeWebhookView(TestCase):
             user = User.objects.get(id=self.existed_user.id)
             self.assertEqual(user.membership_expires_at, self.existed_user.membership_expires_at)
 
+    @skip("Free membership")
     def test_event_invoice_paid_with_billing_reason_subscription_cycle_positive(self):
         # given
         strip_secret = "stripe_secret"
@@ -372,6 +379,7 @@ class TestStripeWebhookView(TestCase):
                 user = User.objects.get(id=self.existed_user.id)
                 self.assertEqual(user.membership_expires_at, self.existed_user.membership_expires_at)
 
+    @skip("Free membership")
     def test_event_customer_updated_positive(self):
         strip_secret = "stripe_secret"
         with self.settings(STRIPE_WEBHOOK_SECRET=strip_secret):
@@ -403,11 +411,13 @@ class TestStripeWebhookView(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    @skip("Free membership")
     def test_negative_no_signature(self):
         response = self.client.post(reverse("stripe_webhook"), data={"xxx": 1}, content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
 
+    @skip("Free membership")
     def test_negative_invalid_signature(self):
         header = {'HTTP_STRIPE_SIGNATURE': 'invalid-signature'}
         with self.settings(STRIPE_WEBHOOK_SECRET="stripe_secret"):

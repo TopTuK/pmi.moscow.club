@@ -16,22 +16,24 @@ from badges.views import create_badge_for_post, create_badge_for_comment
 from club import features
 from comments.api import api_list_post_comments
 from comments.views import create_comment, edit_comment, delete_comment, show_comment, upvote_comment, \
-    retract_comment_vote, pin_comment
+    retract_comment_vote, pin_comment, delete_comment_thread
 from common.feature_flags import feature_switch
 from landing.views import landing, docs, godmode_network_settings, godmode_digest_settings, godmode_settings, \
-    godmode_invite
-from misc.views import stats, network, robots, generate_ical_invite, generate_google_invite
+    godmode_invite, badge_generator
+from misc.views import stats, network, robots, generate_ical_invite, generate_google_invite, show_achievement
 from rooms.views import redirect_to_room_chat, list_rooms
-from notifications.views import render_weekly_digest, email_unsubscribe, email_confirm, render_daily_digest, \
-    email_digest_switch, link_telegram
+from notifications.views import render_weekly_digest, email_unsubscribe, email_confirm, email_digest_switch, \
+    link_telegram
 from notifications.webhooks import webhook_event
 from payments.views.common import membership_expired
 from payments.api import api_gift_days
 from payments.views.stripe import pay, done, stripe_webhook, stop_subscription
+from payments.views.camp import stripe_camp_webhook
 from payments.views.crypto import crypto, coinbase_webhook
 from posts.api import md_show_post, api_show_post, json_feed
 from posts.models.post import Post
 from posts.rss import NewPostsRss
+from posts.user_rss import UserPostsRss
 from posts.sitemaps import sitemaps
 from posts.views.admin_actions import admin_post, announce_post, curate_post
 from posts.views.api import toggle_post_bookmark
@@ -46,8 +48,7 @@ from users.views.friends import toggle_friend, friends
 from users.views.messages import on_review, rejected, banned
 from users.views.muted import toggle_mute, muted
 from users.views.notes import edit_note
-from users.views.profile import profile, toggle_tag, add_expertise, delete_expertise, profile_comments, profile_posts, \
-    profile_badges
+from users.views.profile import profile, toggle_tag, profile_comments, profile_posts, profile_badges
 from users.views.settings import profile_settings, edit_profile, edit_account, edit_notifications, edit_payments, \
     edit_bot, edit_data, request_data
 from users.views.intro import intro
@@ -88,6 +89,7 @@ urlpatterns = [
     path("monies/membership_expired/", membership_expired, name="membership_expired"),
     path("monies/subscription/<str:subscription_id>/stop/", stop_subscription, name="stop_subscription"),
     path("monies/stripe/webhook/", stripe_webhook, name="stripe_webhook"),
+    path("monies/stripe/webhook_camp/", stripe_camp_webhook, name="stripe_camp_webhook"),
     path("monies/coinbase/webhook/", coinbase_webhook, name="coinbase_webhook"),
     path("monies/gift/<int:days>/<slug:user_slug>.json", api_gift_days, name="api_gift_days"),
 
@@ -121,11 +123,10 @@ urlpatterns = [
     path("intro/", intro, name="intro"),
     path("people/", people, name="people"),
     path("achievements/", RedirectView.as_view(url="/stats", permanent=True), name="achievements"),
+    path("achievements/<slug:achievement_code>/", show_achievement, name="show_achievement"),
     path("stats/", stats, name="stats"),
 
     path("profile/tag/<str:tag_code>/toggle/", toggle_tag, name="toggle_tag"),
-    path("profile/expertise/add/", add_expertise, name="add_expertise"),
-    path("profile/expertise/<slug:expertise>/delete/", delete_expertise, name="delete_expertise"),
     path("profile/on_review/", on_review, name="on_review"),
     path("profile/rejected/", rejected, name="rejected"),
     path("profile/banned/", banned, name="banned"),
@@ -167,6 +168,7 @@ urlpatterns = [
     path("comment/<uuid:comment_id>/edit/", edit_comment, name="edit_comment"),
     path("comment/<uuid:comment_id>/pin/", pin_comment, name="pin_comment"),
     path("comment/<uuid:comment_id>/delete/", delete_comment, name="delete_comment"),
+    path("comment/<uuid:comment_id>/delete_thread/", delete_comment_thread, name="delete_comment_thread"),
     path("comment/<uuid:comment_id>/badge/", create_badge_for_comment,
          name="create_badge_for_comment"),
 
@@ -178,7 +180,6 @@ urlpatterns = [
     path("notifications/switch/<str:digest_type>/<str:user_id>/<str:secret>/", email_digest_switch,
          name="email_digest_switch"),
     path("notifications/renderer/digest/weekly/", render_weekly_digest, name="render_weekly_digest"),
-    path("notifications/renderer/digest/daily/<slug:user_slug>/", render_daily_digest, name="render_daily_digest"),
     path("notifications/webhook/<slug:event_type>", webhook_event, name="webhook_event"),
 
     path("docs/<slug:doc_slug>/", docs, name="docs"),
@@ -193,6 +194,7 @@ urlpatterns = [
     path("godmode/network/", godmode_network_settings, name="godmode_network_settings"),
     path("godmode/digest/", godmode_digest_settings, name="godmode_digest_settings"),
     path("godmode/invite/", godmode_invite, name="godmode_invite"),
+    path("godmode/badge_generator/", badge_generator, name="badge_generator"),
     path("godmode/dev_login/", debug_dev_login, name="debug_dev_login"),
     path("godmode/random_login/", debug_random_login, name="debug_random_login"),
     path("godmode/login/<str:user_slug>/", debug_login, name="debug_login"),
@@ -204,6 +206,7 @@ urlpatterns = [
     # feeds
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("posts.rss", NewPostsRss(), name="rss"),
+    path("user/<slug:user_slug>/posts.rss", UserPostsRss(), name="user_rss"),
     path("feed.json", json_feed, name="json_feed"),
     re_path(r"^{}/{}/feed.json$".format(POST_TYPE_RE, ORDERING_RE), json_feed, name="json_feed_ordering"),
 
