@@ -23,7 +23,7 @@ with connection.cursor() as cursor:
 
 
 class Command(BaseCommand):
-    help = "Импорт постов с оригинального vas3k.club на dev/local сборки"
+    help = "Импорт постов с оригинального PMI Moscow на dev/local сборки"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "--service-token",
-            help="service_token приложения, требуется для приватных постов и парсинга комментариев. Получить можно тут: https://vas3k.club/apps/create/",
+            help="service_token приложения, требуется для приватных постов и парсинга комментариев. Получить можно тут: https://pmi.moscow/apps/create/",
         )
 
     def handle(self, *args, **options):
@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
         if options["service_token"]:
             headers.update({'X-Service-Token': options["service_token"]})
-            req = urllib.request.Request("https://vas3k.club/user/me.json", headers=headers)
+            req = urllib.request.Request("https://pmi.moscow/user/me.json", headers=headers)
             try:
                 urllib.request.urlopen(req)
             except urllib.error.HTTPError:
@@ -88,7 +88,7 @@ class Command(BaseCommand):
         }
 
         for x in range(options['skip'], options['pages'] + options['skip']):
-            url = f"https://vas3k.club/feed.json?page={x + 1}"
+            url = f"https://pmi.moscow/feed.json?page={x + 1}"
             self.stdout.write(f"📁 {url}")
             req = urllib.request.Request(url, headers=headers)
             response = urllib.request.urlopen(req)
@@ -191,7 +191,7 @@ def create_user(author):
         defaults.update(slug=slug)
 
         if 'X-Service-Token' in headers.keys():
-            req = urllib.request.Request(f"https://vas3k.club/user/{slug}.json", headers=headers)
+            req = urllib.request.Request(f"https://pmi.moscow/user/{slug}.json", headers=headers)
             response = urllib.request.urlopen(req)
             data = json.load(response)
             defaults.update(**data['user'])
