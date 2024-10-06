@@ -53,8 +53,13 @@
         }
 
     .comment-form-subscribe {
-        opacity: 0.5;
+        opacity: 0.75;
         padding: 0 20px;
+        margin-left: auto;
+    }
+
+    .reply-form-form {
+        scroll-margin-top: 20px;
     }
 
 .reply-form {
@@ -70,17 +75,6 @@
 
     .replies .reply-form {
         margin-left: 0;
-    }
-
-    @media only screen and (max-width : 570px) {
-        .reply-form {
-            margin-top: 20px;
-        }
-
-        .reply-form-avatar .avatar {
-            width: 20px;
-            height: 20px;
-        }
     }
 
     .reply-form textarea {
@@ -116,6 +110,28 @@
     .reply-form .button {
         margin-top: 10px;
     }
+
+@media only screen and (max-width: 570px) {
+    .reply-form {
+        margin-top: 20px;
+    }
+
+    .reply-form-avatar .avatar {
+        width: 20px;
+        height: 20px;
+    }
+
+    .comment-form textarea,
+    .reply-form textarea {
+        /*
+        Caveat!
+        increase font size for textareas on small screens, to avoid mobile Safari zoom-in
+        https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/
+        */
+        font-size: max(1.25rem, 16px);
+        min-height: 300px;
+    }
+}
 
 .thread {
 
@@ -368,7 +384,7 @@
     }
 
     .comment-body-muted {
-        font-size: 120%;
+        font-size: 110%;
         opacity: 0.5;
         padding-bottom: 20px;
     }
@@ -433,6 +449,9 @@
 
         .comment-type-battle-side-a {
             background: rgba(76, 152, 213, 0.3);
+            /* from left border to the end of the center column */
+            grid-area: auto / left-start / auto / center-end;
+            justify-self: start;
         }
 
             .comment-type-battle-side-a:target {
@@ -445,6 +464,9 @@
 
         .comment-type-battle-side-b {
             background: rgba(83, 170, 104, 0.3);
+            /* from center column to the end of the right column */
+            grid-area: auto / center-start / auto / right-end;
+            justify-self: end;
         }
 
             .comment-type-battle-side-b:target {
@@ -464,6 +486,7 @@
         top: 0.7em;
         opacity: 0.5;
         font-weight: 500;
+        grid-area: prefix;
     }
 
         .battle-comment-prefix-side-a {
@@ -474,6 +497,10 @@
             color: #53AA68;
             text-align: right;
         }
+
+    .replies-type-battle {
+        grid-area: replies;
+    }
 
 .reply {
     margin: 10px 0 15px 0;
@@ -674,3 +701,10 @@
     .mention-autocomplete-hint__option--suggested span {
         color: #fff;
     }
+
+
+.comment-moderation {
+    max-width: 500px;
+    margin: 50px auto;
+    text-align: center;
+}

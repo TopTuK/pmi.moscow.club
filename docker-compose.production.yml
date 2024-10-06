@@ -86,6 +86,34 @@ services:
       options:
         max-size: "100M"
 
+  helpdeskbot:
+    <<: *app
+    command: make docker-run-helpdeskbot
+    container_name: club_help_desk_bot
+    environment:
+      - APP_HOST=https://pmi.moscow
+      - POSTGRES_DB=pmi_club
+      - POSTGRES_USER=pmiclub
+      - POSTGRES_PASSWORD=pmiclub
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - REDIS_DB=0
+      - VIRTUAL_HOST=pmi.moscow
+      - VIRTUAL_PATH=/telegram/helpdeskbot/webhook/
+      - VIRTUAL_PORT=8817
+    depends_on:
+      - club_app
+      - postgres
+      - redis
+    ports:
+      - "8817:8817"
+    networks:
+      - club
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
+
   cron:
     <<: *app
     command: make docker-run-cron

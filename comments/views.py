@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -8,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 
 from authn.decorators.auth import require_auth
 from club.exceptions import AccessDenied, RateLimitException
-from comments.forms import CommentForm, ReplyForm, BattleCommentForm
+from comments.forms import CommentForm, ReplyForm, BattleCommentForm, edit_form_class_for_comment
 from comments.models import Comment, CommentVote
 from common.request import parse_ip_address, parse_useragent
 from authn.decorators.api import api
@@ -129,11 +130,11 @@ def edit_comment(request, comment_id):
             raise AccessDenied(title="Комментарии к этому посту закрыты")
 
     post = comment.post
+    FormClass = edit_form_class_for_comment(comment)
 
     if request.method == "POST":
-        form = CommentForm(request.POST, instance=comment)
-        if post.type == Post.TYPE_BATTLE:
-            form = BattleCommentForm(request.POST, instance=comment)
+        form = FormClass(request.POST, instance=comment)
+
         if form.is_valid():
             comment = form.save(commit=False)
             comment.is_deleted = False
@@ -146,9 +147,7 @@ def edit_comment(request, comment_id):
 
             return redirect("show_comment", post.slug, comment.id)
     else:
-        form = CommentForm(instance=comment)
-        if post.type == Post.TYPE_BATTLE:
-            form = BattleCommentForm(instance=comment)
+        form = FormClass(instance=comment)
 
     return render(request, "comments/edit.html", {
         "comment": comment,
@@ -200,6 +199,24 @@ def delete_comment(request, comment_id):
     Comment.update_post_counters(comment.post, update_activity=False)
 
     return redirect("show_comment", comment.post.slug, comment.id)
+
+
+@require_auth
+def delete_comment_thread(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if not request.me.is_moderator:
+        # only moderator can delete whole threads
+        raise AccessDenied(
+            title="Нельзя!",
+            message="Только модератор может удалять треды"
+        )
+
+    # delete child comments completely
+    Comment.objects.filter(Q(reply_to=comment) | Q(reply_to__reply_to=comment)).delete()
+    Comment.objects.filter(id=comment_id).delete()
+
+    return redirect("show_post", comment.post.type, comment.post.slug)
 
 
 @require_auth
