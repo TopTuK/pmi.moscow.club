@@ -129,6 +129,7 @@
         https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/
         */
         font-size: max(1.25rem, 16px);
+        min-height: 300px;
     }
 }
 
@@ -383,7 +384,7 @@
     }
 
     .comment-body-muted {
-        font-size: 120%;
+        font-size: 110%;
         opacity: 0.5;
         padding-bottom: 20px;
     }
