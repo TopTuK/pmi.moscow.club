@@ -57,7 +57,7 @@ def create_moderator_user(apps, schema_editor):
     User.objects.get_or_create(
         slug=MODERATOR_USERNAME,
         defaults=dict(
-            email="moderator@vas3k.club",
+            email="moderator@pmi.moscow",
             secret_hash=random_string(length=20),
             membership_platform_type="direct",
             full_name="Модератор",
@@ -81,7 +81,7 @@ def create_deleted_user(apps, schema_editor):
     User.objects.get_or_create(
         slug=DELETED_USERNAME,
         defaults=dict(
-            email="deleted@vas3k.club",
+            email="deleted@pmi.moscow",
             secret_hash=random_string(length=20),
             membership_platform_type="direct",
             full_name="💀 Юзер-зомби",

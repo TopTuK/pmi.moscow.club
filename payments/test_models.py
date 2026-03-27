@@ -3,6 +3,7 @@ import uuid
 import django
 from django.conf import settings
 from django.test import TestCase
+from unittest import skip
 
 django.setup()  # todo: how to run tests from PyCharm without this workaround?
 
@@ -13,6 +14,7 @@ from payments.products import PRODUCTS
 from users.models.user import User
 
 
+@skip("Free membership")
 class TestPaymentModel(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -77,6 +79,7 @@ class TestPaymentModel(TestCase):
                                     data={"some": "data"})
 
 
+@skip("Free membership")
 class TestProducts(TestCase):
 
     def test_club_subscription_activator_positive_membership_expires_in_future(self):
