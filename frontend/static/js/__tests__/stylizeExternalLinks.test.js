@@ -43,7 +43,7 @@ describe("stylizeExternalLinks", () => {
     });
 
     test("does not modify internal link", () => {
-        document.body.innerHTML = '<a href="https://vas3k.club/posts">Posts</a>';
+        document.body.innerHTML = '<a href="https://pmi.moscow/posts">Posts</a>';
         App.stylizeExternalLinks();
 
         const link = document.querySelector("a");
@@ -52,7 +52,7 @@ describe("stylizeExternalLinks", () => {
     });
 
     test("does not modify internal link with www", () => {
-        document.body.innerHTML = '<a href="https://www.vas3k.club/posts">Posts</a>';
+        document.body.innerHTML = '<a href="https://www.pmi.moscow/posts">Posts</a>';
         App.stylizeExternalLinks();
 
         const link = document.querySelector("a");
@@ -80,7 +80,7 @@ describe("stylizeExternalLinks", () => {
 
     test("correctly filters mixed internal and external links", () => {
         document.body.innerHTML = `
-            <a href="https://vas3k.club/posts">Internal</a>
+            <a href="https://pmi.moscow/posts">Internal</a>
             <a href="https://github.com/vas3k">External 1</a>
             <a href="/about">Relative</a>
             <a href="https://example.com">External 2</a>

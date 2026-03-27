@@ -23,7 +23,7 @@ class GodmodeMassAchievementForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 "maxlength": 50000,
-                "placeholder": "https://vas3k.club/user/vas3k/\nhttps://vas3k.club/user/moderator/\nhttps://vas3k.club/user/petrovich/",
+                "placeholder": "https://pmi.moscow/user/vas3k/\nhttps://pmi.moscow/user/moderator/\nhttps://pmi.moscow/user/petrovich/",
             }
         ),
     )

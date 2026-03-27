@@ -1,7 +1,7 @@
 module.exports = {
     testEnvironment: "jsdom",
     testEnvironmentOptions: {
-        url: "https://vas3k.club",
+        url: "https://pmi.moscow",
     },
     roots: ["<rootDir>/static/js"],
     testMatch: ["**/__tests__/**/*.test.js"],

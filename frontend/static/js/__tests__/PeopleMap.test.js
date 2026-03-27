@@ -30,6 +30,8 @@ jest.mock("mapbox-gl", () => ({
 import { shallowMount } from "@vue/test-utils";
 import PeopleMap from "../components/PeopleMap.vue";
 
+const DEFAULT_AVATAR_URL = "https://media.pmi.moscow/30095075d17a92786cfea143a73d68f5f1b3e71173e3f4ecf16f90d25834e45e.png";
+
 function makeGeojson(features) {
     return {
         type: "FeatureCollection",
@@ -169,7 +171,7 @@ describe("PeopleMap.vue", () => {
 
             var MarkerCtor = require("mapbox-gl").default.Marker;
             var el = MarkerCtor.mock.calls[0][0].element;
-            expect(el.style.backgroundImage).toContain("v.png");
+            expect(el.style.backgroundImage).toContain(DEFAULT_AVATAR_URL);
         });
     });
 
@@ -226,7 +228,7 @@ describe("PeopleMap.vue", () => {
 
             var MarkerCtor = require("mapbox-gl").default.Marker;
             var el = MarkerCtor.mock.calls[0][0].element;
-            expect(el.style.backgroundImage).toContain("v.png");
+            expect(el.style.backgroundImage).toContain(DEFAULT_AVATAR_URL);
         });
 
         it("ignores features with null or 'null' avatars when selecting cluster avatar", () => {
@@ -245,7 +247,7 @@ describe("PeopleMap.vue", () => {
 
             var MarkerCtor = require("mapbox-gl").default.Marker;
             var el = MarkerCtor.mock.calls[0][0].element;
-            expect(el.style.backgroundImage).toContain("v.png");
+            expect(el.style.backgroundImage).toContain(DEFAULT_AVATAR_URL);
         });
 
         it("uses map.project() linearly — once per feature + once per cluster", () => {

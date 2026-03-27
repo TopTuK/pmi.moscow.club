@@ -23,9 +23,9 @@ class IsSafeUrlTests(TestCase):
     def test_absolute_url_same_host_is_safe(self):
         self.assertTrue(is_safe_url("http://127.0.0.1:8000/user/foo/"))
 
-    @override_settings(APP_HOST="https://vas3k.club")
+    @override_settings(APP_HOST="https://pmi.moscow")
     def test_absolute_url_production_host_is_safe(self):
-        self.assertTrue(is_safe_url("https://vas3k.club/user/foo/"))
+        self.assertTrue(is_safe_url("https://pmi.moscow/user/foo/"))
 
     def test_external_url_is_rejected(self):
         self.assertFalse(is_safe_url("https://evil.com/phishing"))

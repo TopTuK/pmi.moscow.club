@@ -39,7 +39,7 @@ class TestCreateLinksFromText(TestCase):
 
     def test_creates_linked_posts_from_urls(self):
         text = " ".join(
-            f"https://vas3k.club/post/{p.slug}/" for p in self.target_posts
+            f"https://pmi.moscow/post/{p.slug}/" for p in self.target_posts
         )
 
         LinkedPost.create_links_from_text(self.source_post, text)
@@ -58,14 +58,14 @@ class TestCreateLinksFromText(TestCase):
 
     def test_deduplicates_urls(self):
         slug = self.target_posts[0].slug
-        text = f"https://vas3k.club/post/{slug}/ and again https://vas3k.club/post/{slug}/"
+        text = f"https://pmi.moscow/post/{slug}/ and again https://pmi.moscow/post/{slug}/"
 
         LinkedPost.create_links_from_text(self.source_post, text)
 
         self.assertEqual(LinkedPost.objects.count(), 1)
 
     def test_ignores_nonexistent_slugs(self):
-        text = "https://vas3k.club/post/nonexistent_slug_xyz/"
+        text = "https://pmi.moscow/post/nonexistent_slug_xyz/"
 
         LinkedPost.create_links_from_text(self.source_post, text)
 
@@ -80,7 +80,7 @@ class TestCreateLinksFromText(TestCase):
             author=self.author,
             visibility=Post.VISIBILITY_DRAFT,
         )
-        text = f"https://vas3k.club/post/{draft.slug}/"
+        text = f"https://pmi.moscow/post/{draft.slug}/"
 
         LinkedPost.create_links_from_text(self.source_post, text)
 
