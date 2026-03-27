@@ -28,7 +28,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./frontend/static:/tmp/static
+      - club_static:/tmp/static
       - ./gdpr/downloads:/app/gdpr/downloads
     depends_on:
       - redis
@@ -168,3 +168,6 @@ networks:
   club:
   pmi_network:
     external: true
+
+volumes:
+  club_static:
