@@ -211,7 +211,7 @@ class LLMResponseTest(BaseTelegramTest, TestCase):
                         self.SEND_MESSAGE_PATH,
                         {
                             "chat_id": "12345",
-                            "text": "🙈 Я отвечаю только чувакам с активной подпиской в Клубе. Иди продлевай! https://vas3k.club/user/me/",
+                            "text": "🙈 Я отвечаю только чувакам с активной подпиской в Клубе. Иди продлевай! https://pmi.moscow/user/me/",
                             "disable_web_page_preview": "True",
                             "disable_notification": "False",
                         },

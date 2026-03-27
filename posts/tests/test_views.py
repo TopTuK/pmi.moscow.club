@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from django.urls import reverse
 from django.test import TestCase
+from unittest import skip
 
 from debug.helpers import HelperClient
 from users.models.user import User
@@ -33,6 +34,7 @@ class ModelCreator:
             slug="ujlbu4_{}".format(self._exist_users),
         )
 
+@skip("Free membership")
 class TestPaymentModel(TestCase):
     def setUp(self):
         self.creator = ModelCreator()

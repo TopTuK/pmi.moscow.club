@@ -15,12 +15,24 @@ __all__ = ["clicker"]
 clicker_item = re.compile(r"^(\[[ xX]\])\s+")
 
 
-def clicker_hook(
-    md: "Markdown",
-    tokens: Iterable[Dict[str, Any]],
-    state: "BlockState",
-) -> Iterable[Dict[str, Any]]:
-    return _rewrite_all_list_items(tokens)
+def clicker_hook(md: "Markdown", *args: Any) -> Any:
+    """
+    Support both Mistune hook signatures:
+    - v3-style: hook(md, state)
+    - older/custom: hook(md, tokens, state)
+    """
+    if len(args) == 1:
+        state = args[0]
+        tokens = getattr(state, "tokens", None)
+        if tokens is not None:
+            _rewrite_all_list_items(tokens)
+        return state
+
+    if len(args) >= 2:
+        tokens = args[0]
+        return _rewrite_all_list_items(tokens)
+
+    return None
 
 
 def render_clicker(renderer: "BaseRenderer", text: str, checked: bool = False) -> str:
