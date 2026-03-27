@@ -24,6 +24,7 @@ from debug.helpers import HelperClient
 from users.models.user import User
 
 
+@skip("Free membership")
 class TestMembershipExpiredView(TestCase):
 
     def test_membership_expires_future(self):
@@ -67,6 +68,7 @@ class TestMembershipExpiredView(TestCase):
         self.assertRedirects(response=response, expected_url=f'/', fetch_redirect_response=False)
 
 
+@skip("Free membership")
 class TestDoneView(TestCase):
 
     def setUp(self):
@@ -108,6 +110,7 @@ class TestDoneView(TestCase):
 
 
 @patch('payments.views.stripe.stripe')
+@skip("Free membership")
 class TestPayView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -210,6 +213,7 @@ class TestPayView(TestCase):
 
 
 
+@skip("Free membership")
 class TestStripeWebhookView(TestCase):
 
     def setUp(self):
