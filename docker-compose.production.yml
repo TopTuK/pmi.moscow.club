@@ -175,5 +175,6 @@ networks:
   club:
   pmi_network:
     external: true
+
 volumes:
   club_static:
