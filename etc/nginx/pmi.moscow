@@ -1,3 +1,7 @@
+# nginx-proxy: copy to vhost.d/pmi.moscow (reload nginx-proxy).
+# Bind mounts (example): .../frontend/static -> /home/club/frontend/static;
+# .../gdpr/downloads -> /home/club/gdpr/downloads
+
 charset utf-8;
 client_max_body_size 30M;
 index index.html index.htm;
@@ -10,7 +14,7 @@ rewrite ^/favicon.ico$ https://pmi.moscow/static/images/favicon/favicon.ico;
 rewrite ^/favicon.png$ https://pmi.moscow/static/images/favicon/favicon-32x32.png;
 
 location /static/ {
-    root /home/club/frontend/;
+    root /home/club/frontend;
     gzip_static on;
     expires     max;
     add_header Cache-Control "public";
