@@ -1,6 +1,11 @@
 # nginx-proxy: copy to vhost.d/pmi.moscow (reload nginx-proxy).
-# Bind mounts (example): .../frontend/static -> /home/club/frontend/static;
-# .../gdpr/downloads -> /home/club/gdpr/downloads
+#
+# REQUIRED bind mounts in rproxy/docker-compose.yml (see etc/nginx/docker-compose.rproxy.example.yml):
+#   /home/toptuk/pmi.moscow/frontend/static  -> /home/club/frontend/static:ro
+#   /home/toptuk/pmi.moscow/gdpr/downloads   -> /home/club/gdpr/downloads:ro
+#
+# Without these mounts nginx looks inside the container at /home/club/frontend/static
+# and returns 404 even when files exist on the host under pmi.moscow/frontend/static.
 
 charset utf-8;
 client_max_body_size 30M;
