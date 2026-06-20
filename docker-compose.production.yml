@@ -1,7 +1,7 @@
 services:
   club_app: &app
     image: ghcr.io/toptuk/pmiclub:${GITHUB_SHA:-latest}
-    # Named volume is root-owned on first use; app runs as UID 1000 and must populate /tmp/static (Makefile).
+    # Bind-mounted static dir may be root-owned on first deploy; app runs as UID 1000 and populates /tmp/static (Makefile).
     user: "0:0"
     command:
       - sh
@@ -33,7 +33,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - club_static:/tmp/static
+      - ./frontend/static:/tmp/static
       - ./gdpr/downloads:/app/gdpr/downloads
     depends_on:
       - redis
@@ -127,7 +127,7 @@ services:
       POSTGRES_PASSWORD: pmiclub
       POSTGRES_DB: pmi_club
     volumes:
-      - /home/s-admin/pmi.moscow/pgdata14:/var/lib/postgresql/data:rw
+      - /home/toptuk/pmi.moscow/pgdata14:/var/lib/postgresql/data:rw
     ports:
       - "127.0.0.1:54333:5432"
     networks:
@@ -137,7 +137,7 @@ services:
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:
-      - /home/s-admin/pmi.moscow/backup/pgdata:/backups
+      - /home/toptuk/pmi.moscow/backup/pgdata:/backups
     links:
       - postgres
     depends_on:
@@ -176,5 +176,3 @@ networks:
   pmi_network:
     external: true
 
-volumes:
-  club_static:
