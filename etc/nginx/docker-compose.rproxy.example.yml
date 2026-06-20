@@ -1,0 +1,28 @@
+# Example reverse-proxy stack for pmi.moscow (nginx-proxy / jwilder/nginx-proxy).
+# Copy to your rproxy/docker-compose.yml and adjust host paths.
+#
+# Static files MUST be bind-mounted into the nginx container at the paths used
+# in vhost.d/pmi.moscow (root /home/club/frontend and /home/club/gdpr).
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.6
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      # Club static files (host path -> path inside nginx container):
+      - /home/toptuk/pmi.moscow/frontend/static:/home/club/frontend/static:ro
+      - /home/toptuk/pmi.moscow/gdpr/downloads:/home/club/gdpr/downloads:ro
+    networks:
+      - pmi_network
+
+networks:
+  pmi_network:
+    external: true
