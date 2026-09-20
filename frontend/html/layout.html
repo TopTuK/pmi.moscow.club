@@ -75,9 +75,12 @@
                 <a href="{% url "invites" %}">Пригласить друга</a> &nbsp;&middot;&nbsp;
             {% endif %}
 
-            <a href="https://github.com/vas3k/vas3k.club">Опенсорс</a> &nbsp;&middot;&nbsp;
+            <a href="https://github.com/TopTuK/pmi.moscow.club">Опенсорс</a>
 
-            <a href="{% url "show_post" "docs" "blocked_dolor" %}">Оплата из России</a>
+            {% if features.PAYMENTS_ENABLED %}
+                &nbsp;&middot;&nbsp;
+                <a href="{% url "show_post" "docs" "blocked_dolor" %}">Оплата из России</a>
+            {% endif %}
 
             <br><br>
 

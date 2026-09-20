@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import pytz
+from zoneinfo import ZoneInfo
 from django import forms
 from django.conf import settings
 from django.contrib.postgres.forms import SimpleArrayField
@@ -63,7 +63,7 @@ class AbstractPostForm(forms.ModelForm):
         label="Комната",
         required=False,
         blank=True,
-        queryset=Room.objects.filter(is_visible=True, is_open_for_posting=True).order_by("title").all(),
+        queryset=Room.visible_rooms().order_by("title"),
     )
     collectible_tag_code = CollectibleTagField(
         label="Прикрепить коллекционный тег",
@@ -436,7 +436,7 @@ class PostEventForm(AbstractPostForm):
                     "month": cleaned_data["event_month"],
                     "time": str(cleaned_data["event_time"]),
                     "timezone": cleaned_data["event_timezone"],
-                    "utc_offset": datetime.now(pytz.timezone(cleaned_data["event_timezone"]))
+                    "utc_offset": datetime.now(ZoneInfo(cleaned_data["event_timezone"]))
                     .utcoffset().total_seconds() // 60,
                     "location": cleaned_data["event_location"],
                     "participants": self.instance.metadata.get("event", {}).get("participants", []) \

@@ -19,7 +19,7 @@
 TBD: перевести.
 
 ## 🛠 Технический стек
-👨‍💻 **TL;DR: Django, Postgres, Redis, Vue.js, Webpack**
+👨‍💻 **TL;DR: Django, Postgres, Redis, Vue.js, Webpack, UV**
 Оригинальная информация доступна тут: [vas3k.club](https://github.com/vas3k/vas3k.club)
 
 ## 🧑‍💻 Хочу покодить
@@ -61,6 +61,16 @@ TBD: перевести.
 
 ### 🔮 Простой способ запуска платформы клуба
 Для локальной разработки, тестирования телеграм ботов, запуск платформы без Docker инструкция здесь: [docs/setup.md](docs/setup.md).
+
+Основные команды для локальной разработки:
+
+```sh
+make run-dev
+make run-queue
+make migrate
+make test
+make test-frontend
+```
 
 ### Хочу сделать свой Клуб
 Инструкция по созданию Клуба:

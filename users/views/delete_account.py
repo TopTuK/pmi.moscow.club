@@ -4,8 +4,10 @@ from django.conf import settings
 from django.shortcuts import redirect, render
 from django_q.tasks import async_task
 
+from authn.cache import clear_auth_token_cache_for_user
 from authn.decorators.auth import require_auth
 from authn.models.session import Session, Code
+from common.request import parse_ip_address, parse_useragent
 from notifications.telegram.common import send_telegram_message, ADMIN_CHAT
 from club.exceptions import BadRequest, AccessDenied
 from gdpr.models import DataRequests
@@ -29,7 +31,13 @@ def request_delete_account(request):
 
     DataRequests.register_forget_request(request.me)
 
-    code = Code.create_for_user(user=request.me, recipient=request.me.email, length=settings.GDPR_DELETE_CODE_LENGTH)
+    code = Code.create_for_user(
+        user=request.me,
+        recipient=request.me.email,
+        length=settings.GDPR_DELETE_CODE_LENGTH,
+        ipaddress=parse_ip_address(request),
+        useragent=parse_useragent(request),
+    )
     async_task(
         send_delete_account_request_email,
         user=request.me,
@@ -60,6 +68,7 @@ def confirm_delete_account(request):
     request.me.save()
 
     # remove sessions
+    clear_auth_token_cache_for_user(request.me)
     Session.objects.filter(user=request.me).delete()
 
     # notify user

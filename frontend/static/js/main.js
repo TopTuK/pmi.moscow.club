@@ -2,13 +2,11 @@ import Vue from "vue";
 
 import "../css/index.css";
 
-import "./inline-attachment";
-import "./codemirror-4.inline-attachment";
+import "./vendor/inline-attachment";
 
-import App from "./App.js";
-import ClubApi from "./common/api.service.js";
-import { handleCommentThreadCollapseToggle, collapseCommentThread } from "./common/comments.js";
 import vSelect from "vue-select";
+import App from "./App.js";
+import { collapseCommentThread, handleCommentThreadCollapseToggle } from "./common/comments.js";
 
 Vue.component("post-upvote", () => import("./components/PostUpvote.vue"));
 Vue.component("post-bookmark", () => import("./components/PostBookmark.vue"));
@@ -28,6 +26,7 @@ Vue.component("clicker", () => import("./components/Clicker.vue"));
 Vue.component("v-select", vSelect);
 Vue.component("tag-select", () => import("./components/TagSelect.vue"));
 Vue.component("simple-select", () => import("./components/SimpleSelect.vue"));
+Vue.component("coauthors-select", () => import("./components/CoauthorsSelect.vue"));
 Vue.component("reply-form", () => import("./components/ReplyForm.vue"));
 Vue.component("theme-switcher", () => import("./components/ThemeSwitcher.vue"));
 Vue.component("location-select", () => import("./components/LocationSelect.vue"));

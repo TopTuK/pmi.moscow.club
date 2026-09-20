@@ -16,7 +16,7 @@
 
                 {% if invite.is_used %}
                     <p>
-                        Пользователь «{{ invite.invited_user.full_name }}» зарегистрировался или продлил свой аккаунт по этому инвайту {{ invite.used_at | date:"j E Y" }} 👇
+                        Пользователь «{{ invite.invited_user.full_name }}» активировал этот инвайт {{ invite.used_at | date:"j E Y" }} 👇
                     </p>
 
                     {% if invite.invited_user %}
@@ -46,7 +46,7 @@
                     </p>
 
                     <p>
-                        По ней можно зарегистрироваться в Клубе, либо продлить уже существующий аккаунт.
+                        По ней можно зарегистрироваться в Клубе.
                     </p>
                 {% endif %}
             </div>

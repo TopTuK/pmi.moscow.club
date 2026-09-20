@@ -2,31 +2,33 @@
 
 {% block content %}
     <div class="content pay">
-        {% if request.headers.cf_ipcountry == "RU" or settings.DEBUG %}
-            <div class="block pay-warning pay-description">
-                <div class="pay-title">О, кажется вы из России 🌚</div>
+        {% if not is_invite %}
+            {% if request.headers.cf_ipcountry == "RU" or settings.DEBUG %}
+                <div class="block pay-warning pay-description">
+                    <div class="pay-title">О, кажется вы из России 🌚</div>
 
-                <p>
-                    Ну штош, санкции, VPN'ы, блокировки карточек, все дела...
-                </p>
+                    <p>
+                        Санкции, VPN'ы, заблокированные карты, все дела...
+                    </p>
 
-                <p>
-                    Потому ребята из коммьюнити сделали специального телеграм-бота, через которого можно заплатить рублями.
-                    Правда только на 1 год и без автопродления, но это всяко лучше, чем ничего.
-                </p>
+                    <p>
+                        Ребята из коммьюнити сделали волшебную ссылку, через которую пока еще можно заплатить рублями.
+                        Правда только на 1 год и без автопродления, но это всяко лучше, чем ничего.
+                    </p>
 
-                <p>
-                    <a href="{{ settings.TELEGRAM_PAY_BOT_URL }}" class="button pay-button">
-                        Оплатить рублями через телеграм-бота
-                    </a>
-                </p>
+                    <p>
+                        <a href="{% url "rubles" %}" class="button pay-button">
+                            💵 Оплатить рублями через ЮКассу
+                        </a>
+                    </p>
 
-                <p>
-                    <br><br>
-                    Но если вдруг вы счастливый обладатель любой иностранной банковской карты —
-                    рекомендуем использовать наш стандартный способ оплаты ниже. Это будет дешевле 👇
-                </p>
-            </div>
+                    <p>
+                        <br><br>
+                        Но если вдруг вы счастливый обладатель любой иностранной банковской карты —
+                        рекомендуем использовать наш стандартный способ оплаты ниже. Это дешевле и гибче 👇
+                    </p>
+                </div>
+            {% endif %}
         {% endif %}
 
         <div class="block pay-description">
@@ -57,8 +59,7 @@
 
         <div class="block pay-warning">
             <p>
-                ⚠️ Платежи из <strong>России и некоторых банков Беларуси</strong> больше не проходят из-за санкций.
-                Альтернативные способы оплаты ищите <strong><a href="{% url "show_post" "docs" "blocked_dolor" %}">в нашем гайде</a></strong>.
+                ⚠️ Для оплаты с российских карт используйте наши <strong><a href="{% url "show_post" "docs" "blocked_dolor" %}">альтеративные методы</a></strong>.
             </p>
             <p>
                 🤔 За другими вариантами заходите на почту <a href="mailto:sergey.sidorov@pmi.moscow"><strong>Написать</strong></a>

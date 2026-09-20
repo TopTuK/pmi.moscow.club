@@ -257,6 +257,12 @@ ACHIEVEMENTS = [
         "image": "https://vas3k.club/static/images/achievements/vas3k_camp_2025.webp",
         "style": "background-color: #FF9F4B; font-size: 130%;",
     }),
+    ("vas3k_camp_2026", {
+        "name": "Вастрик 🔥 Кэмп 2026",
+        "description": "Участник Вастрик Кэмпа в Либерленде летом 2026",
+        "image": "https://vas3k.club/static/images/achievements/vas3k_camp_2026.webp",
+        "style": "background-color: #FF9400; font-size: 130%;",
+    }),
     ("vas3k_quest_2024", {
         "name": "Золотая говнотерка",
         "description": "Призёр первого Вастрик.Квеста, проходившего в Сербии в 2024 году",
@@ -280,6 +286,24 @@ ACHIEVEMENTS = [
         "description": "Участнику Вастрик Флота в Турции осенью 2025",
         "image": "https://vas3k.club/static/images/achievements/vas3k_flot_2025.png",
         "style": "background-color: #4c98d5; font-size: 120%;",
+    }),
+    ("vas3k_skipper", {
+        "name": "Вастрик ⛵ Шкипер",
+        "description": "Прошедшему обучение на шкипера в Клубе",
+        "image": "https://vas3k.club/static/images/achievements/vas3k_skipper1.png",
+        "style": "background-color: #1976D2; font-size: 120%;",
+    }),
+    ("vas3k_burn_2026", {
+        "name": "Вастрик 🔥 Бёрнер",
+        "description": "Участнику лагеря на AfrikaBurn 2026",
+        "image": "https://vas3k.club/static/images/achievements/vas3k_burn_2026.png",
+        "style": "background-color: #EBB90A; font-size: 120%;",
+    }),
+    ("vas3k_retreat", {
+        "name": "Вастрик Ретрит",
+        "description": "Участнику Вастрик Ретрита в Черногории",
+        "image": "https://vas3k.club/static/images/achievements/vas3k_retreat.webp",
+        "style": "background-color: #000000; font-size: 120%;",
     }),
     ("spooky", {
         "name": "Спуки",
@@ -307,13 +331,13 @@ ACHIEVEMENTS = [
     }),
     ("geoguessr_lite", {
         "name": "Мидуэй атолл",
-        "description": "Отличает Англию от Австралии по кенгуру, а Польшу от Перу — по надписям на стенах",
+        "description": "Почти не путает континенты в Geoguessr",
         "image": "https://vas3k.club/static/images/achievements/geoguessr_lite.png",
-        "style": "background-color: #C4D9D7; font-size: 130%;",
+        "style": "background-color: #C4D9D7; font-size: 140%;",
     }),
     ("geoguessr_beast", {
         "name": "Реюньон",
-        "description": "Знает индийские языки, все шоссе длиннее 300 км и цвет грязи на каждом континенте",
+        "description": "Угадывает любую индийскую деревню в Geoguessr",
         "image": "https://vas3k.club/static/images/achievements/geoguessr_beast.png",
         "style": "background-color: #F37857; font-size: 130%;",
     }),
@@ -358,6 +382,30 @@ ACHIEVEMENTS = [
         "description": "Призовое место в одном из клубных квизов",
         "image": "https://vas3k.club/static/images/achievements/vas3k_quizz.webp",
         "style": "background-color: #FF5154; font-size: 130%;",
+    }),
+    ("club_chef", {
+        "name": "Клубный Повар",
+        "description": "Готовил вкусных едов клубням в оффлайне",
+        "image": "https://vas3k.club/static/images/achievements/club_chef.webp",
+        "style": "background-color: #F6DBA8; font-size: 130%;",
+    }),
+    ("club_engineer", {
+        "name": "Инженер конструктор",
+        "description": "DIY-ил что-то в оффлайне вместе с другими клубнями",
+        "image": "https://vas3k.club/static/images/achievements/club_engineer.webp",
+        "style": "background-color: #C98F43; font-size: 130%;",
+    }),
+    ("vibe_creator", {
+        "name": "Творец вайбов",
+        "description": "За особые заслуги в вытворении чудачеств в оффлайне",
+        "image": "https://vas3k.club/static/images/achievements/vibe_creator.webp",
+        "style": "background-color: #FF6BC5; font-size: 140%;",
+    }),
+    ("wine_lover_2026", {
+        "name": "Затейливый дегустатор",
+        "description": "За участие в Винной Затее 2026",
+        "image": "https://vas3k.club/static/images/achievements/wine_lover_2026.webp",
+        "style": "background-color: #63C7CC; font-size: 130%;",
     }),
 ]
 

@@ -75,18 +75,25 @@ def post_ban_action(request, user: User, **context):
         # Unban
         if data["is_unbanned"]:
             unban_user(user)
+            return render(request, "godmode/message.html", {
+                **context,
+                "title": f"Юзер {user.full_name} разбанен",
+                "message": f"Снова может щитпостить",
+            })
+
+        is_banned = False
 
         # Temporary ban
         if data["is_temporarily_banned"]:
             reason = TEMPORARY_BAN_REASONS.get(data["temporary_ban_reason"])
-            temporary_ban_user(
+            is_banned = temporary_ban_user(
                 user=user,
                 reason=reason
             )
 
         # Custom ban
         if data["is_custom_banned"]:
-            custom_ban_user(
+            is_banned = custom_ban_user(
                 user=user,
                 days=data["custom_ban_days"],
                 reason=BanReason(name=data["custom_ban_name"], description=data["custom_ban_reason"],
@@ -96,15 +103,15 @@ def post_ban_action(request, user: User, **context):
         # Permanent ban
         if data["is_permanently_banned"]:
             reason = PERMANENT_BAN_REASONS.get(data["permanent_ban_reason"])
-            permanently_ban_user(
+            is_banned = permanently_ban_user(
                 user=user,
                 reason=reason
             )
 
         return render(request, "godmode/message.html", {
             **context,
-            "title": f"Юзер {user.full_name} забанен",
-            "message": f"Ура 🎉",
+            "title": f"Юзер {user.full_name} забанен" if is_banned else "Ошибка",
+            "message": f"Ура 🎉" if is_banned else "😭 Вы забыли поставить галочку или случилась какая-то ошибка",
         })
     else:
         return render(request, "godmode/actions/user_ban.html", {

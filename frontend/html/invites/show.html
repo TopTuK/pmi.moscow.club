@@ -6,16 +6,16 @@
 
 {% block content %}
     <div class="content user-edit">
-        <div class="form-title"><strong class="text-200">🎁</strong><br>Вам подарили 1 год в Клубе</div>
+        <div class="form-title"><strong class="text-200">🎁</strong><br>Вас пригласили в Клуб</div>
 
         <div class="block">
             <div class="block-description block-description-center">
                 <p>
-                    Ого! <strong>{{ invite.user.full_name }}</strong> подарил вам 1 год подписки на Вастрик Клуб. Должно быть, вы это заслужили! 🥳
+                    Ого! <strong>{{ invite.user.full_name }}</strong> пригласил вас в PM Russia Club. Добро пожаловать! 🥳
                 </p>
 
                 {% if request.me %}
-                    <p>Нажмите на кнопку ниже, чтобы мы начислили его на ваш аккаунт 👇</p>
+                    <p>Нажмите на кнопку ниже, чтобы активировать приглашение 👇</p>
 
                     {% include "users/widgets/card.html" with user=request.me %}
 
