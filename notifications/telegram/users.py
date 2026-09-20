@@ -1,9 +1,14 @@
-import telegram
+import logging
+
 from django.conf import settings
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ParseMode
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
 
 from ai.moderation import ai_rate_intro_quality
+
+log = logging.getLogger(__name__)
 from notifications.telegram.common import Chat, ADMIN_CHAT, send_telegram_message, render_html_message
 from bot.handlers.common import UserRejectReason
 from users.models.user import User
@@ -19,41 +24,53 @@ def notify_profile_needs_review(user, intro):
     message = send_telegram_message(
         chat=ADMIN_CHAT,
         text=render_html_message("moderator_new_member_review.html", user=user, intro=intro),
-        reply_markup=telegram.InlineKeyboardMarkup([
+        reply_markup=InlineKeyboardMarkup([
             [
-                telegram.InlineKeyboardButton("👍 Впустить", callback_data=f"approve_user:{user.id}")
+                InlineKeyboardButton("👍 Впустить", callback_data=f"approve_user:{user.id}")
             ],
             [
-                telegram.InlineKeyboardButton("❌️ Плохое интро", callback_data=f"reject_user_intro:{user.id}"),
+                InlineKeyboardButton("❌️ Плохое интро", callback_data=f"reject_user_intro:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("❌️ Плохое имя", callback_data=f"reject_user_name:{user.id}"),
+                InlineKeyboardButton("❌️ Плохое имя", callback_data=f"reject_user_name:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("❌️ Слишком общее", callback_data=f"reject_user_general:{user.id}"),
+                InlineKeyboardButton("❌️ Слишком общее", callback_data=f"reject_user_general:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("❌️ Нет контактов", callback_data=f"reject_user_data:{user.id}"),
+                InlineKeyboardButton("❌️ Нет контактов", callback_data=f"reject_user_data:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("❌️ ИИ-слоп", callback_data=f"reject_user_ai:{user.id}"),
+                InlineKeyboardButton("❌️ ИИ-слоп", callback_data=f"reject_user_ai:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("❌️ Агрессия", callback_data=f"reject_user_aggression:{user.id}"),
+                InlineKeyboardButton("❌️ Агрессия", callback_data=f"reject_user_aggression:{user.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("✏️ Написать юзеру", url=admin_profile_url),
+                InlineKeyboardButton("✏️ Написать юзеру", url=admin_profile_url),
             ]
         ])
     )
 
-    ai_intro_rate_text = ai_rate_intro_quality(user, intro)
-    send_telegram_message(
-        chat=ADMIN_CHAT,
-        text=ai_intro_rate_text,
-        parse_mode=telegram.ParseMode.HTML,
-        reply_to_message_id=message.message_id,
-    )
+    if not message:
+        log.warning(f"Failed to send intro review for user {user.slug} to moderators, skipping AI review")
+        return
+
+    try:
+        ai_intro_rate_text = ai_rate_intro_quality(user, intro)
+        send_telegram_message(
+            chat=ADMIN_CHAT,
+            text=ai_intro_rate_text,
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=message.message_id,
+        )
+    except Exception:
+        log.exception(f"Failed to send AI intro review for user {user.slug}")
+        send_telegram_message(
+            chat=ADMIN_CHAT,
+            text="⚠️ Не удалось получить оценку от ИИ",
+            reply_to_message_id=message.message_id,
+        )
 
 
 def notify_user_profile_approved(user):

@@ -12,17 +12,18 @@
 
         <div class="block-description block-description-center">
             <p>
-                Здесь можно купить инвайт и подарить его своему другу, чтобы он смог зарегистрироваться в Клубе или продлил уже имеющийся аккаунт.
+                Здесь находятся ваши инвайты, которыми можно поделиться с друзьями.
             </p>
 
-            <br>
-
-            <form action="{% url "pay" %}" method="get">
-                {% csrf_token %}
-                <input type="hidden" name="product_code" value="club1_invite">
-                <input type="hidden" name="is_invite" value="true">
-                <button type="submit" class="button">🎁 Купить инвайт-код</button>
-            </form>
+            {% if features.PAYMENTS_ENABLED %}
+                <br>
+                <form action="{% url "pay" %}" method="get">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_code" value="club1_invite">
+                    <input type="hidden" name="is_invite" value="true">
+                    <button type="submit" class="button">🎁 Получить инвайт-код</button>
+                </form>
+            {% endif %}
 
             {% if me.is_god %}
                 <br>
@@ -54,8 +55,7 @@
             </div>
 
             <small>
-                После покупки код действителен год. Дни в Клубе начинают считаться только со дня его активации.
-                До активации инвайт можно переподарить любому другому человеку.
+                Код действителен год. До активации инвайт можно передать другому человеку.
             </small>
         </div>
     </div>

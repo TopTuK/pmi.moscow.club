@@ -85,7 +85,7 @@
                     {% if form.city.errors %}<span class="form-row-errors">{{ form.city.errors }}</span>{% endif %}
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" id="map-location">
                     <label class="form-label">
                         Где отображать вас на общей <strong><a href="{% url "people" %}">карте</a></strong>?
                     </label>
@@ -98,6 +98,19 @@
                     {% if form.latitude.errors %}<span class="form-row-errors">Latitude: {{ form.latitude.errors }}</span>{% endif %}
                     {% if form.longitude.errors %}<span class="form-row-errors">Longitude: {{ form.longitude.errors }}</span>{% endif %}
                     {% if form.geo.errors %}<span class="form-row-errors">Geo: {{ form.geo.errors }}</span>{% endif %}
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.country.id_for_label }}" class="form-label">
+                        {{ form.referer.label }}
+                    </label>
+                    {{ form.referer }}
+
+                    {% if form.referer.errors %}<span class="form-row-errors">{{ form.referer.errors }}</span>{% endif %}
+
+                    <span class="form-row-help">
+                        Имя или профиль человека, который рассказал вам про Клуб. Если нашли сами — оставьте пустым.
+                    </span>
                 </div>
 
                 <button type="submit" class="button button-big" name="profile_publicity_level" value="{{ user.profile_publicity_level }}">Сохранить изменения</button>

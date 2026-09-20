@@ -20,12 +20,17 @@
                 </li>
                 <li>
                     <a href="{% url "network" %}">
-                        💬 Чаты
+                        💬 Чаты и сервисы
                     </a>
                 </li>
                 <li>
                     <a href="{% url "stats" %}">
-                        🏆 Топы
+                        🏆 Ачивки
+                    </a>
+                </li>
+                <li>
+                    <a href="https://events.vas3k.club" target="_blank">
+                        🔥 Ивенты
                     </a>
                 </li>
             </ul>
@@ -34,16 +39,6 @@
                 <li>
                     <a href="{% url "feed_type" "post" %}" class="{% if post_type == "post" %}feed-sidebar-menu-selected{% endif %}">
                         <i class="fas fa-pen-square"></i> Посты
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url "feed_type" "event" %}" class="{% if post_type == "event" %}feed-sidebar-menu-selected{% endif %}">
-                        <i class="fas fa-calendar-times"></i> События
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url "feed_type" "project" %}" class="{% if post_type == "project" %}feed-sidebar-menu-selected{% endif %}">
-                        <i class="fas fa-pencil-ruler"></i> Проекты
                     </a>
                 </li>
                 <li>
@@ -59,6 +54,16 @@
                 <li>
                     <a href="{% url "feed_type" "thread" %}" class="{% if post_type == "thread" %}feed-sidebar-menu-selected{% endif %}">
                         <i class="fas fa-stream"></i> Треды
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url "feed_type" "project" %}" class="{% if post_type == "project" %}feed-sidebar-menu-selected{% endif %}">
+                        <i class="fas fa-pencil-ruler"></i> Проекты
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url "feed_type" "event" %}" class="{% if post_type == "event" %}feed-sidebar-menu-selected{% endif %}">
+                        <i class="fas fa-calendar-times"></i> События
                     </a>
                 </li>
                 <li>
@@ -80,14 +85,20 @@
         </div>
 
         <div class="feed-sidebar-block">
-            <div class="feed-sidebar-header">Комнаты</div>
+            <div class="feed-sidebar-header">
+                <a href="{% url "list_rooms" %}">
+                    Комнаты&nbsp;&rarr;
+                </a>
+            </div>
+
             <div class="feed-sidebar-topics">
                 {% for room in rooms|slice:":15" %}
                     {% include "rooms/widgets/room.html" with room=room type="card" %}
                 {% endfor %}
             </div>
+
             <div class="feed-sidebar-topics-more">
-                <a class="button button-small button-inverted" href="{% url "list_rooms" %}">Все комнаты &rarr;</a>
+                <a class="button button-small button-inverted" href="{% url "list_rooms" %}">Все {{ rooms|length }} {{ rooms|length|rupluralize:"комната,комнаты,комнат" }}...</a>
             </div>
         </div>
     </aside>
