@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="content pay">
+        <div class="block pay-description">
+            <div class="pay-title">
+                Платим за Клуб рублями 💰<br>
+                {% if user %}
+                    <small>
+                        ваш аккаунт: <strong>{{ user.email }}</strong>
+                    </small>
+                {% endif %}
+            </div>
+
+            {% if user and session %}
+                <a href="{{ session.confirmation.confirmation_url }}" class="button button-big pay-button">
+                    +1 год через ЮКассу
+                </a>
+            {% else %}
+                <p>
+                    Укажите ваш e-mail или <a href="{% url "login" %}">войдите</a> в существующий аккаунт
+                </p>
+                <form action="." method="get">
+                    <input type="email" name="email" placeholder="your@mail.ru" required>
+                    <input type="submit" value="▶︎" class="button">
+                </form>
+            {% endif %}
+
+            <p style="font-size: 300%; margin: 20px 0;">
+                ☝️
+            </p>
+
+            <p style="font-size: 90%;">
+                ❌ Бот продает +1 год без автопродления (потом можно докупить ещё)
+            </p>
+            <p style="font-size: 90%;">
+                ❌ В цену включена комиссия бота. Он неофициальный, автору тоже надо кушать
+            </p>
+            <p style="font-size: 90%;">
+                ❌ НЕТ рефандов. Если вам не понравится или вы не пройдете модерацию — мы не сможем вернуть деньги даже через саппорт. Подумайте дважды!
+            </p>
+        </div>
+
+        <div class="block pay-warning">
+            <p>
+                🤔 За другими вариантами заходите на почту <a href="mailto:club@vas3k.club"><strong>club@vas3k.club</strong></a> или читайте <strong><a href="{% url "show_post" "docs" "blocked_dolor" %}">наш гайд</a></strong>
+            </p>
+        </div>
+    </div>
+{% endblock %}

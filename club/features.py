@@ -16,3 +16,7 @@ PATREON_AUTH_ENABLED = False
 #   True - Free registration
 #   False - Paid registration
 FREE_MEMBERSHIP = True
+
+# Expose payment checkout, billing settings, webhooks and renewal UI.
+# Payment models and migrations stay installed for historical compatibility.
+PAYMENTS_ENABLED = not FREE_MEMBERSHIP

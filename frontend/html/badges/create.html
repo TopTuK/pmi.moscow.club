@@ -40,14 +40,14 @@
                     </p>
                 {% endif %}
 
-                <p>
-                    Награды стоят денег, что придаёт им ценность.
-                    Для простоты расчётов мы используем дни оставшегося членства в Клубе.
-                </p>
-
-                <p>
-                    <strong>Ваш баланс:</strong> <span class="badge-price">💎 <a href="{% url "edit_payments" me.slug %}">{{ me.membership_days_left|floor }} {{ me.membership_days_left|rupluralize:"день,дня,дней" }}</a></span>
-                </p>
+                {% if features.PAYMENTS_ENABLED %}
+                    <p>
+                        Награды расходуют дни оставшегося членства в Клубе.
+                    </p>
+                    <p>
+                        <strong>Ваш баланс:</strong> <span class="badge-price">💎 <a href="{% url "edit_payments" me.slug %}">{{ me.membership_days_left|floor }} {{ me.membership_days_left|rupluralize:"день,дня,дней" }}</a></span>
+                    </p>
+                {% endif %}
             </div>
 
             <form action="." method="post">
@@ -55,7 +55,7 @@
 
                 <div class="create-badge-list">
                     {% for badge in badges %}
-                        <div class="create-badge-list-item zoom-on-hover {% if me.membership_days_left < badge.price_days %}create-badge-list-item-disabled{% endif %}">
+                        <div class="create-badge-list-item zoom-on-hover {% if features.PAYMENTS_ENABLED and me.membership_days_left < badge.price_days %}create-badge-list-item-disabled{% endif %}">
                             <input id="badge_{{ badge.code }}" type="radio" name="badge_code" value="{{ badge.code }}" required {% if forloop.first %}checked{% endif %}>
                             <label for="badge_{{ badge.code }}" class="block create-badge-list-item-label">
                                 <img class="create-badge-list-item-image" src="{% static "images/badges/big" %}/{{ badge.code }}.png" alt="{{ badge.title }}">
@@ -63,7 +63,9 @@
                                 {% if badge.description %}
                                     <span class="create-badge-list-item-description">{{ badge.description }}</span>
                                 {% endif %}
-                                <span class="badge-price create-badge-list-item-price">💎 {{ badge.price_days }}</span>
+                                {% if features.PAYMENTS_ENABLED %}
+                                    <span class="badge-price create-badge-list-item-price">💎 {{ badge.price_days }}</span>
+                                {% endif %}
                             </label>
                         </div>
                     {% endfor %}

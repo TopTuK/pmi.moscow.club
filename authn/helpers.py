@@ -4,12 +4,15 @@ from enum import StrEnum, unique
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
+from django.conf import settings
+from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from django.conf import settings
-
+from authn.cache import AUTH_TOKEN_CACHE_TIMEOUT, auth_token_cache_key, clear_auth_token_cache
 from authn.models.session import Session
+from club import features
+from common.request import parse_ip_address, parse_useragent
 from users.models.user import User
 
 log = logging.getLogger(__name__)
@@ -35,13 +38,31 @@ def authorized_user(request):
 
 def authorized_user_with_session(request) -> Tuple[Optional[User], Optional[Session]]:
     auth_token = request.COOKIES.get("token") or request.GET.get("token")
-    if auth_token:
-        return user_by_token(auth_token)
+    if not auth_token:
+        return None, None
 
-    return None, None
+    user, session = user_by_token(auth_token)
+
+    # fill missing session request info
+    if session and (session.ipaddress is None or session.useragent is None):
+        session.ipaddress = parse_ip_address(request)
+        session.useragent = parse_useragent(request)
+        session.save(update_fields=["ipaddress", "useragent"])
+        cache.set(auth_token_cache_key(auth_token), (user, session), timeout=AUTH_TOKEN_CACHE_TIMEOUT)
+
+    return user, session
 
 
 def user_by_token(token) -> Tuple[Optional[User], Optional[Session]]:
+    cache_key = auth_token_cache_key(token)
+    cached = cache.get(cache_key)
+    if cached is not None:
+        user, session = cached
+        if not session or session.expires_at <= datetime.utcnow():
+            clear_auth_token_cache(token)
+            return None, None
+        return user, session
+
     session = Session.objects\
         .filter(token=token)\
         .order_by()\
@@ -51,6 +72,7 @@ def user_by_token(token) -> Tuple[Optional[User], Optional[Session]]:
     if not session or session.expires_at <= datetime.utcnow():
         return None, None  # session is expired
 
+    cache.set(cache_key, (session.user, session), timeout=AUTH_TOKEN_CACHE_TIMEOUT)
     return session.user, session
 
 
@@ -67,7 +89,7 @@ def get_access_denied_reason(user) -> Optional[AccessDeniedReason]:
     if user.is_banned:
         return AccessDeniedReason.BANNED
 
-    if not user.is_active_membership:
+    if not features.FREE_MEMBERSHIP and not user.is_active_membership:
         return AccessDeniedReason.MEMBERSHIP_EXPIRED
 
     if user.moderation_status in (

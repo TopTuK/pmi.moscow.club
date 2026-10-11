@@ -113,7 +113,7 @@
             {% include "posts/widgets/not_commentable.html" %}
         {% endif %}
 
-        {% if me and not me.is_active_membership %}
+        {% if features.PAYMENTS_ENABLED and me and not me.is_active_membership %}
             {% include "posts/widgets/membership_expired.html" %}
         {% endif %}
 

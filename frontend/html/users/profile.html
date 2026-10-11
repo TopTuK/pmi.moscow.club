@@ -12,7 +12,7 @@
 
 {% block feeds %}
     <link rel="alternate" type="application/rss+xml"
-          title="Вастрик.Клуб: Посты {{ user.slug }}"
+          title="{{ settings.APP_NAME }}: Посты {{ user.slug }}"
           href="{{ settings.APP_HOST }}{% url "user_rss" user.slug %}" />
 {% endblock %}
 
@@ -49,9 +49,11 @@
                     ⚙️&nbsp;Настройки профиля
                 </a>
 
-                <a href="{% url "edit_payments" user.slug %}" class="button">
-                    💎&nbsp;Баланс: {{ user.membership_days_left | cool_number }} {{ user.membership_days_left | rupluralize:"день,дня,дней" }}
-                </a>
+                {% if features.PAYMENTS_ENABLED %}
+                    <a href="{% url "edit_payments" user.slug %}" class="button">
+                        💎&nbsp;Баланс: {{ user.membership_days_left | cool_number }} {{ user.membership_days_left | rupluralize:"день,дня,дней" }}
+                    </a>
+                {% endif %}
 
                 <a href="{% url "friends" user.slug %}" class="button">
                     🤝&nbsp;Мои чуваки
@@ -219,6 +221,12 @@
                     {% endif %}
                 </div>
                 <div class="text-body profile-intro-text">
+                    {% if user.referer %}
+                        <div class="profile-user-referer">
+                            ↔️ <strong>Про Клуб мне рассказал:</strong> {{user.referer }}
+                        </div>
+                    {% endif %}
+
                     {% render_post intro %}
                 </div>
                 <div class="profile-intro-footer">

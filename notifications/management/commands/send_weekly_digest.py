@@ -1,9 +1,8 @@
-import base64
 import logging
 from datetime import datetime, timedelta
 
-import telegram
 from django.conf import settings
+from telegram.constants import ParseMode
 from django.core.management import BaseCommand
 
 from club.exceptions import NotFound
@@ -11,6 +10,7 @@ from godmode.models import ClubSettings
 from notifications.digests import generate_weekly_digest
 from notifications.telegram.common import send_telegram_message, CLUB_CHANNEL, render_html_message, Chat
 from notifications.email.sender import send_mass_email
+from notifications.helpers import generate_notification_token
 from posts.models.post import Post
 from search.models import SearchIndex
 from users.models.user import User
@@ -66,7 +66,6 @@ class Command(BaseCommand):
                 email_digest_type=User.EMAIL_DIGEST_TYPE_NOPE
             )\
             .filter(
-                membership_expires_at__gte=datetime.utcnow() - timedelta(days=30),
                 moderation_status=User.MODERATION_STATUS_APPROVED,
                 telegram_id__isnull=False,
             )
@@ -84,14 +83,13 @@ class Command(BaseCommand):
                         include_unsubscribe=True,
                     ),
                     disable_preview=False,
-                    parse_mode=telegram.ParseMode.HTML,
+                    parse_mode=ParseMode.HTML,
                 )
 
         # sending emails
         email_subscribers = User.objects\
             .filter(
                 is_email_verified=True,
-                membership_expires_at__gte=datetime.utcnow() - timedelta(days=14),
                 moderation_status=User.MODERATION_STATUS_APPROVED,
             )\
             .exclude(email_digest_type=User.EMAIL_DIGEST_TYPE_NOPE)\
@@ -104,7 +102,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                secret_code = base64.b64encode(user.secret_hash.encode("utf-8")).decode()
+                secret_code = generate_notification_token(user)
 
                 digest = digest_template\
                     .replace("%user_id%", str(user.id))\
@@ -133,7 +131,7 @@ class Command(BaseCommand):
                     digest_intro=digest_intro
                 ),
                 disable_preview=False,
-                parse_mode=telegram.ParseMode.HTML,
+                parse_mode=ParseMode.HTML,
             )
 
             # flush digest intro and title for next time

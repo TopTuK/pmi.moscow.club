@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -22,14 +21,13 @@ class Command(BaseCommand):
         # select daily subscribers
         if not options.get("production"):
             subscribed_users = User.objects.filter(
-                email__in=dict(settings.ADMINS).values(),
+                email__in=settings.ADMINS,
                 telegram_id__isnull=False
             )
         else:
             subscribed_users = User.objects\
                 .filter(
                     email_digest_type=User.EMAIL_DIGEST_TYPE_DAILY,
-                    membership_expires_at__gte=datetime.utcnow(),
                     moderation_status=User.MODERATION_STATUS_APPROVED,
                     deleted_at__isnull=True,
                 )

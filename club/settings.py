@@ -1,3 +1,4 @@
+import ipaddress
 import os
 from datetime import timedelta, datetime
 
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.contrib.sitemaps",
+    "django.contrib.postgres",
     "club",
     "authn.apps.AuthnConfig",
     "bookmarks.apps.BookmarksConfig",
@@ -34,6 +36,7 @@ INSTALLED_APPS = [
     "payments.apps.PaymentsConfig",
     "posts.apps.PostsConfig",
     "users.apps.UsersConfig",
+    "map.apps.MapConfig",
     "notifications.apps.NotificationsConfig",
     "search.apps.SearchConfig",
     "gdpr.apps.GdprConfig",
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "club.middleware.CrashLoggingMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -70,7 +74,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, "helpdeskbot/templates"),
             os.path.join(BASE_DIR, "frontend/html"),
         ],
-        "APP_DIRS": True,
+        "APP_DIRS": DEBUG,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -80,7 +84,18 @@ TEMPLATES = [
                 "users.context_processors.users.me",
                 "posts.context_processors.feed.rooms",
                 "posts.context_processors.feed.ordering",
-            ]
+            ],
+            **({} if DEBUG else {
+                "loaders": [
+                    (
+                        "django.template.loaders.cached.Loader",
+                        [
+                            "django.template.loaders.filesystem.Loader",
+                            "django.template.loaders.app_directories.Loader",
+                        ],
+                    ),
+                ],
+            }),
         },
     }
 ]
@@ -99,7 +114,7 @@ LOGGING = {
     "loggers": {
         "": {  # "catch all" loggers by referencing it with the empty string
             "handlers": ["console"],
-            "level": "DEBUG",
+            "level": "DEBUG" if DEBUG else "INFO",
         },
     },
 }
@@ -116,17 +131,24 @@ DATABASES = {
     }
 }
 
-if bool(os.getenv("POSTGRES_USE_POOLING")):
+if TESTS_RUN:
+    # Persistent connections break test DB teardown
+    DATABASES["default"]["CONN_MAX_AGE"] = 0
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+elif bool(os.getenv("POSTGRES_USE_POOLING")):
+    DATABASES["default"]["CONN_MAX_AGE"] = 0
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = False
     DATABASES["default"]["OPTIONS"] = {
         "pool": {
-            "min_size": 5,
-            "max_size": 15,
-            "timeout": 10, # fail in 10 sec under load
-            "max_idle": 300, # close idle after 5 min
+            "min_size": 1,
+            "max_size": 4,  # keep small: one pool per gunicorn worker process
+            "timeout": 10,  # fail in 10 sec under load
+            "max_idle": 300,  # close idle after 5 min
         }
     }
 else:
-    DATABASES["default"]["CONN_MAX_AGE"] = 0
+    # Reuse connections inside each worker (0 was opening a new PG connection per request)
+    DATABASES["default"]["CONN_MAX_AGE"] = int(os.getenv("POSTGRES_CONN_MAX_AGE") or 60)
     DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
 
@@ -135,8 +157,10 @@ else:
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "UTC"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = False
+
+# Prefer HTTPS when urlize expands scheme-less URLs 
+URLIZE_ASSUME_HTTPS = True
 
 # Static files (CSS, JavaScript, Images)
 
@@ -199,7 +223,11 @@ AUTH_CODE_LENGTH = 6
 AUTH_CODE_EXPIRATION_TIMEDELTA = timedelta(minutes=10)
 AUTH_MAX_CODE_TIMEDELTA = timedelta(hours=3)
 AUTH_MAX_CODE_COUNT = 3
+AUTH_MAX_CODE_COUNT_PER_IP = 5
+AUTH_MAX_CODE_COUNT_TOTAL = 100
 AUTH_MAX_CODE_ATTEMPTS = 3
+
+NOTIFICATION_TOKEN_EXPIRATION_TIMEDELTA = timedelta(weeks=6)
 
 DEFAULT_PAGE_SIZE = 70
 SEARCH_PAGE_SIZE = 25
@@ -277,8 +305,7 @@ TELEGRAM_CLUB_CHANNEL_ID = os.getenv("TELEGRAM_CLUB_CHANNEL_ID")
 TELEGRAM_CLUB_CHAT_ID = os.getenv("TELEGRAM_CLUB_CHAT_ID")
 TELEGRAM_ONLINE_CHANNEL_URL = os.getenv("TELEGRAM_ONLINE_CHANNEL_URL")
 TELEGRAM_ONLINE_CHANNEL_ID = os.getenv("TELEGRAM_ONLINE_CHANNEL_ID")
-TELEGRAM_PAY_BOT_URL = "https://t.me/vas3kpaybot"
-TELEGRAM_BOT_WEBHOOK_URL = "https://pmi.moscow/telegram/webhook/"
+TELEGRAM_BOT_WEBHOOK_URL = os.getenv("TELEGRAM_BOT_WEBHOOK_URL", "https://pmi.moscow/telegram/webhook/")
 TELEGRAM_BOT_WEBHOOK_HOST = "0.0.0.0"
 TELEGRAM_BOT_WEBHOOK_PORT = 8816
 TELEGRAM_API_ID = os.getenv("TELEGRAM_API_ID")
@@ -286,11 +313,24 @@ TELEGRAM_API_HASH = os.getenv("TELEGRAM_API_HASH")
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY") or ""
 STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY") or ""
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET") or ""
 STRIPE_CANCEL_URL = APP_HOST + "/join/"
 STRIPE_SUCCESS_URL = APP_HOST + "/monies/done/?reference={CHECKOUT_SESSION_ID}"
 STRIPE_CUSTOMER_PORTAL_URL = "https://billing.stripe.com/p/login/6oEcMM7Sj7YfaWIbII"
 
-WEBHOOK_SECRETS = set(os.getenv("WEBHOOK_SECRETS", "").split(","))
+YOOKASSA_API_KEY = os.getenv("YOOKASSA_API_KEY")
+YOOKASSA_SHOP_ID = os.getenv("YOOKASSA_SHOP_ID")
+YOOKASSA_IP_WHITELIST = [
+    ipaddress.ip_network("185.71.76.0/27"),
+    ipaddress.ip_network("185.71.77.0/27"),
+    ipaddress.ip_network("77.75.153.0/25"),
+    ipaddress.ip_network("77.75.156.11/32"),
+    ipaddress.ip_network("77.75.156.35/32"),
+    ipaddress.ip_network("77.75.154.128/25"),
+    ipaddress.ip_network("2a02:5180::/32"),
+]
+
+WEBHOOK_SECRETS = set(filter(None, os.getenv("WEBHOOK_SECRETS", "").split(",")))
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -305,6 +345,7 @@ RATE_LIMIT_COMMENTS_PER_DAY = 100
 RATE_LIMIT_COMMENT_PER_DAY_CUSTOM_KEY = "comments_per_day"
 POST_VIEW_COOLDOWN_PERIOD = timedelta(days=1)  # how much time must pass before a repeat viewing of a post counts
 POST_HOTNESS_PERIOD = timedelta(days=5)  # time window for hotness recalculation script
+POST_DESCRIPTION_LENGTH = 250  # truncated post text length in RSS/JSON feeds and previews
 MAX_COMMENTS_FOR_DELETE_VS_CLEAR = 10  # number of comments after which the post cannot be deleted
 MIN_DAYS_TO_GIVE_BADGES = 50  # minimum "days" balance to buy and gift any badge
 MAX_MUTE_COUNT = 25  # maximum number of users allowed to mute

@@ -316,6 +316,8 @@
     .badge-generator-table {
         table-layout: fixed;
         border-collapse: collapse;
+        max-width: 700px;
+        margin: 0 auto;
     }
 
         .badge-generator-table td {
@@ -328,36 +330,46 @@
         color-adjust: exact;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        grid-template-columns: 90px auto;
+        grid-template-columns: 70px auto;
         column-gap: 15px;
+        row-gap: 5px;
         grid-template-rows: auto auto;
         box-shadow: none;
         margin-bottom: 0;
-        padding: 30px 20px 20px;
+        padding: 30px 25px;
         border-radius: 0;
         height: 100%;
+        font-size: 80%;
+        aspect-ratio: 8.5/5.5;
+        align-items: center;
     }
 
     .badge-generator-results .profile-card-info {
         font-size: 85%;
         padding-top: 0;
+        max-height: 138px;
     }
+
+
+        .badge-generator-results .profile-card-age {
+            top: -9px;
+        }
 
         .badge-generator-results .profile-user-name {
             font-size: 200%;
-            padding-bottom: 7px;
+            padding-bottom: 4px;
             line-height: 1.1em;
         }
 
         .badge-generator-results .profile-user-job {
             font-size: 120%;
+            padding-bottom: 4px;
         }
 
         .badge-generator-results .profile-user-location {
             font-size: 120%;
             opacity: 0.8;
             position: relative;
-            left: -5px;
         }
 
         .badge-generator-results .profile-user-fullname {
@@ -379,15 +391,14 @@
         gap: 10px;
         display: flex;
         justify-content: center;
-        padding-top: 15px;
-        padding-bottom: 0;
+        padding: 0;
 
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
 
         overflow: hidden;
-        max-height: 70px;
+        max-height: 28px;
     }
 
     .badge-generator-results .user-badge-achievement {
@@ -395,6 +406,9 @@
         height: 20px;
         padding: 3px;
         border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
 /* Mobile responsive styles */

@@ -6,6 +6,7 @@ from django_q.tasks import async_task
 
 from authn.helpers import is_safe_url, set_session_cookie
 from authn.models.session import Session, Code
+from common.request import parse_ip_address, parse_useragent
 from notifications.email.users import send_auth_email
 from notifications.telegram.users import notify_user_auth
 from users.models.user import User
@@ -13,6 +14,7 @@ from users.models.user import User
 from club import features
 from datetime import datetime, timedelta
 from django.db import IntegrityError
+
 
 def email_login(request):
     if request.method != "POST":
@@ -24,6 +26,8 @@ def email_login(request):
         return redirect("login")
 
     email_or_login = email_or_login.strip()
+    if features.FREE_MEMBERSHIP and ("." not in email_or_login or "@" not in email_or_login):
+        return redirect("login")
 
     # email/nickname login
     if features.FREE_MEMBERSHIP:
@@ -43,20 +47,26 @@ def email_login(request):
             )
         except IntegrityError:
             return render(request, "error.html", {
-                    "title": "Что-то пошло не так 🤔",
-                    "message": "Напишите нам, и мы всё починим. Или попробуйте ещё раз.",
-                }, status=404)           
+                "title": "Что-то пошло не так 🤔",
+                "message": "Напишите нам, и мы всё починим. Или попробуйте ещё раз.",
+            }, status=404)
     else:
         user = User.objects.filter(Q(email=email_or_login.lower()) | Q(slug=email_or_login)).first()
         if not user:
             return render(request, "error.html", {
                 "title": "Такого юзера нет 🤔",
                 "message": "Пользователь с такой почтой не найден в списке членов Клуба. "
-                        "Попробуйте другую почту или никнейм. "
-                        "Если совсем ничего не выйдет, напишите нам, попробуем помочь.",
+                           "Попробуйте другую почту или никнейм. "
+                           "Если совсем ничего не выйдет, напишите нам, попробуем помочь.",
             }, status=404)
 
-    code = Code.create_for_user(user=user, recipient=user.email, length=settings.AUTH_CODE_LENGTH)
+    code = Code.create_for_user(
+        user=user,
+        recipient=user.email,
+        length=settings.AUTH_CODE_LENGTH,
+        ipaddress=parse_ip_address(request),
+        useragent=parse_useragent(request),
+    )
     async_task(send_auth_email, user, code)
     async_task(notify_user_auth, user, code)
 
@@ -75,10 +85,14 @@ def email_login_code(request):
 
     goto = request.GET.get("goto")
     email = email.lower().strip()
-    code = code.lower().strip()
+    code = code.upper().strip()
 
     user = Code.check_code(recipient=email, code=code)
-    session = Session.create_for_user(user)
+    session = Session.create_for_user(
+        user,
+        ipaddress=parse_ip_address(request),
+        useragent=parse_useragent(request),
+    )
 
     if not user.is_email_verified:
         # save 1 click and verify email

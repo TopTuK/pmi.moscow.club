@@ -1,10 +1,15 @@
-import telegram
+import logging
+
 from django.conf import settings
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ParseMode
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
 
 from ai.moderation import ai_rate_post_quality
 from common.regexp import USERNAME_RE
+
+log = logging.getLogger(__name__)
 from notifications.telegram.common import Chat, CLUB_CHANNEL, send_telegram_message, render_html_message, \
     send_telegram_image, CLUB_CHAT, ADMIN_CHAT, CLUB_ONLINE, VIBES_CHAT
 from posts.models.post import Post
@@ -67,28 +72,40 @@ def send_published_post_to_moderators(post):
     message = send_telegram_message(
         chat=ADMIN_CHAT,
         text=render_html_message("moderator_new_post_review.html", post=post),
-        reply_markup=telegram.InlineKeyboardMarkup([
+        reply_markup=InlineKeyboardMarkup([
             *[
-                [telegram.InlineKeyboardButton(f"❌ {title}", callback_data=f"reject_post_{reason}:{post.id}")]
+                [InlineKeyboardButton(f"❌ {title}", callback_data=f"reject_post_{reason}:{post.id}")]
                 for reason, title in REJECT_POST_REASONS.get(post.type) or []
             ],
             [
-                telegram.InlineKeyboardButton("❌ В черновики", callback_data=f"reject_post:{post.id}"),
-                telegram.InlineKeyboardButton("😕 Так себе", callback_data=f"forgive_post:{post.id}"),
+                InlineKeyboardButton("❌ В черновики", callback_data=f"reject_post:{post.id}"),
+                InlineKeyboardButton("😕 Так себе", callback_data=f"forgive_post:{post.id}"),
             ],
             [
-                telegram.InlineKeyboardButton("👍 Одобрить", callback_data=f"approve_post:{post.id}"),
+                InlineKeyboardButton("👍 Одобрить", callback_data=f"approve_post:{post.id}"),
             ],
         ])
     )
 
-    ai_post_rate_text = ai_rate_post_quality(post)
-    send_telegram_message(
-        chat=ADMIN_CHAT,
-        text=ai_post_rate_text,
-        parse_mode=telegram.ParseMode.HTML,
-        reply_to_message_id=message.message_id,
-    )
+    if not message:
+        log.warning(f"Failed to send post {post.id} to moderators, skipping AI review")
+        return
+
+    try:
+        ai_post_rate_text = ai_rate_post_quality(post)
+        send_telegram_message(
+            chat=ADMIN_CHAT,
+            text=ai_post_rate_text,
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=message.message_id,
+        )
+    except Exception:
+        log.exception(f"Failed to send AI review for post {post.id}")
+        send_telegram_message(
+            chat=ADMIN_CHAT,
+            text="⚠️ Не удалось получить оценку от ИИ",
+            reply_to_message_id=message.message_id,
+        )
 
 
 def send_intro_changes_to_moderators(post):
@@ -103,7 +120,7 @@ def announce_in_online_channel(post):
     send_telegram_message(
         chat=CLUB_ONLINE,
         text=render_html_message("channel_post_announce.html", post=post),
-        parse_mode=telegram.ParseMode.HTML,
+        parse_mode=ParseMode.HTML,
         disable_preview=True,
     )
 
@@ -123,7 +140,7 @@ def announce_in_club_channel(post, announce_text=None, image=None):
             chat=CLUB_CHANNEL,
             text=announce_text,
             disable_preview=False,
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
         )
 
 
@@ -133,7 +150,7 @@ def announce_in_club_chats(post):
         send_telegram_message(
             chat=CLUB_CHAT,
             text=render_html_message("channel_post_announce.html", post=post),
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
             disable_preview=True,
             reply_markup=post_reply_markup(post),
         )
@@ -143,7 +160,7 @@ def announce_in_club_chats(post):
         send_telegram_message(
             chat=Chat(id=post.room.chat_id),
             text=render_html_message("channel_post_announce.html", post=post),
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
             disable_preview=True,
             reply_markup=post_reply_markup(post),
         )
@@ -157,13 +174,13 @@ def notify_post_approved(post: Post):
         send_telegram_message(
             chat=Chat(id=post.author.telegram_id),
             text=render_html_message("post_approved_in_room.html", post=post),
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
         )
     else:
         send_telegram_message(
             chat=Chat(id=post.author.telegram_id),
             text=render_html_message("post_approved.html", post=post),
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
         )
 
     return None
@@ -179,7 +196,7 @@ def notify_post_rejected(post, reason):
         send_telegram_message(
             chat=Chat(id=post.author.telegram_id),
             text=text,
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
         )
 
 
@@ -193,7 +210,7 @@ def notify_post_collectible_tag_owners(post):
                     send_telegram_message(
                         chat=Chat(id=tag_user.user.telegram_id),
                         text=render_html_message("post_collectible_tag.html", post=post, tag=tag),
-                        parse_mode=telegram.ParseMode.HTML,
+                        parse_mode=ParseMode.HTML,
                         reply_markup=post_reply_markup(post),
                     )
 
@@ -233,7 +250,7 @@ def notify_post_room_subscribers(post):
                 send_telegram_message(
                     chat=Chat(id=subscriber.user.telegram_id),
                     text=render_html_message("post_room_subscriber.html", post=post, room=post.room),
-                    parse_mode=telegram.ParseMode.HTML,
+                    parse_mode=ParseMode.HTML,
                     reply_markup=post_reply_markup(post),
                 )
 
@@ -244,11 +261,11 @@ def post_reply_markup(post):
         "post_slug": post.slug
     })
 
-    return telegram.InlineKeyboardMarkup([
+    return InlineKeyboardMarkup([
         [
-            telegram.InlineKeyboardButton("👍", callback_data=f"upvote_post:{post.id}"),
-            telegram.InlineKeyboardButton("🔗", url=post_url),
-            telegram.InlineKeyboardButton("🔔", callback_data=f"subscribe:{post.id}"),
+            InlineKeyboardButton("👍", callback_data=f"upvote_post:{post.id}"),
+            InlineKeyboardButton("🔗", url=post_url),
+            InlineKeyboardButton("🔔", callback_data=f"subscribe:{post.id}"),
         ],
     ])
 
@@ -258,13 +275,13 @@ def notify_post_label_changed(post):
     send_telegram_message(
         chat=ADMIN_CHAT,
         text=render_html_message(moderator_template, post=post),
-        parse_mode=telegram.ParseMode.HTML,
+        parse_mode=ParseMode.HTML,
     )
     if post.label_code is not None and post.label['notify'] and post.author.telegram_id:
         send_telegram_message(
             chat=Chat(id=post.author.telegram_id),
             text=render_html_message("post_label.html", post=post),
-            parse_mode=telegram.ParseMode.HTML,
+            parse_mode=ParseMode.HTML,
         )
 
 

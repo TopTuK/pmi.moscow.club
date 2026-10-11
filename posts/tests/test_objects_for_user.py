@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.test import TestCase
 
@@ -59,7 +59,7 @@ class TestPostObjectsForUser(TestCase):
 
         post = Post.objects_for_user(self.user).get(id=self.post.id)
 
-        expected_ms = round(vote.created_at.timestamp() * 1000)
+        expected_ms = round(vote.created_at.replace(tzinfo=timezone.utc).timestamp() * 1000)
         self.assertIsNotNone(post.upvoted_at)
         self.assertAlmostEqual(post.upvoted_at, expected_ms, delta=1000)
 
@@ -81,8 +81,13 @@ class TestPostObjectsForUser(TestCase):
         self.assertIsNone(post.unread_comments)
 
     def test_returns_visible_objects_for_none_user(self):
-        qs = Post.objects_for_user(None)
-        self.assertTrue(qs.filter(id=self.post.id).exists())
+        draft = self.creator.create_post()
+        draft.visibility = Post.VISIBILITY_DRAFT
+        draft.save(update_fields=["visibility"])
+        ids = list(Post.objects_for_user(None).values_list("id", flat=True))
+
+        self.assertIn(self.post.id, ids)
+        self.assertNotIn(draft.id, ids)
 
     def test_executes_in_single_query(self):
         PostVote.objects.create(user=self.user, post=self.post)
@@ -106,7 +111,7 @@ class TestCommentObjectsForUser(TestCase):
 
         comment = Comment.objects_for_user(self.user).get(id=self.comment.id)
 
-        expected_ms = round(vote.created_at.timestamp() * 1000)
+        expected_ms = round(vote.created_at.replace(tzinfo=timezone.utc).timestamp() * 1000)
         self.assertIsNotNone(comment.upvoted_at)
         self.assertAlmostEqual(comment.upvoted_at, expected_ms, delta=1000)
 

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 
@@ -25,6 +26,7 @@ class Room(models.Model):
     chat_url = models.URLField(null=True, blank=True)
     chat_id = models.CharField(max_length=32, null=True, blank=True)
     chat_member_count = models.IntegerField(default=0)
+    admins = ArrayField(models.CharField(max_length=32), default=list, null=False, db_index=True)
     send_new_posts_to_chat = models.BooleanField(default=True)
     send_new_comments_to_chat = models.BooleanField(default=False)
 
@@ -41,6 +43,10 @@ class Room(models.Model):
 
     index = models.PositiveIntegerField(default=0)
 
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    geojson = models.JSONField(null=True, blank=True)
+
     class Meta:
         db_table = "rooms"
         ordering = ["-chat_member_count", "index"]
@@ -50,6 +56,19 @@ class Room(models.Model):
 
     def emoji(self):
         return re.sub("<.*?>", "", self.icon) if self.icon else ""
+
+    @classmethod
+    def visible_rooms(cls):
+        return cls.objects.filter(is_visible=True, is_open_for_posting=True)
+
+    @property
+    def admins_with_details(self):
+        if hasattr(self, "_admins_with_details"):
+            return self._admins_with_details
+        if not self.admins:
+            return []
+        users_by_slug = User.objects.in_bulk(self.admins, field_name="slug")
+        return [users_by_slug[slug] for slug in self.admins if slug in users_by_slug]
 
     def update_last_activity(self):
         now = datetime.utcnow()
@@ -71,6 +90,26 @@ class Room(models.Model):
             "chat_name": self.chat_name,
             "chat_url": f"{settings.APP_HOST}{self.get_private_url()}" if self.url or self.chat_url else None,
             "chat_member_count": self.chat_member_count,
+        }
+
+    def to_map_marker_feature(self):
+        if self.latitude is None or self.longitude is None:
+            return None
+        return {
+            "type": "Feature",
+            "properties": {
+                "id": self.slug,
+                "title": self.title,
+                "image": self.image,
+                "icon": self.emoji(),
+                "color": self.color,
+                "url": self.get_private_url(),
+                "member_count": self.chat_member_count or 0,
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [self.longitude, self.latitude],
+            },
         }
 
 

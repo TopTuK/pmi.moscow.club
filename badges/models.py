@@ -5,6 +5,7 @@ from uuid import uuid4
 from django.db import models, transaction, IntegrityError
 from django.db.models import F, Count
 
+from club import features
 from club.exceptions import InsufficientFunds, BadRequest, ContentDuplicated
 from comments.models import Comment
 from posts.models.post import Post
@@ -77,7 +78,7 @@ class UserBadge(models.Model):
                 message="Это что такое-то вообще!"
             )
 
-        if badge.price_days >= from_user.membership_days_left():
+        if features.PAYMENTS_ENABLED and badge.price_days >= from_user.membership_days_left():
             raise InsufficientFunds(
                 title="💸 Недостаточно средств :(",
                 message=f"Вы не можете подарить юзеру эту награду, "
@@ -103,12 +104,13 @@ class UserBadge(models.Model):
                     message="Повторно ту же самую награду дарить нельзя. Но вы можете выбрать другую!"
                 )
 
-            # deduct days balance from profile
-            User.objects\
-                .filter(id=from_user.id)\
-                .update(
-                    membership_expires_at=F("membership_expires_at") - timedelta(days=badge.price_days)
-                )
+            if features.PAYMENTS_ENABLED:
+                # deduct days balance from profile
+                User.objects\
+                    .filter(id=from_user.id)\
+                    .update(
+                        membership_expires_at=F("membership_expires_at") - timedelta(days=badge.price_days)
+                    )
 
             # add badge to post/comment metadata (for caching purposes)
             comment_or_post = comment or post
@@ -158,9 +160,9 @@ class UserBadge(models.Model):
     def to_dict(self):
         return {
             "badge": self.badge.to_dict(),
-            "from_user": self.from_user.to_dict(),
+            "from_user": self.from_user.to_dict() if self.from_user else None,
             "created_at": self.created_at.isoformat(),
-            "post": {"id": self.post.id},
-            "comment": {"id": self.comment.id},
+            "post": {"id": self.post.id} if self.post else None,
+            "comment": {"id": self.comment.id} if self.comment else None,
             "note": self.note,
         }

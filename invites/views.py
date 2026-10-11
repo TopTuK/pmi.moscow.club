@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -9,6 +10,7 @@ from django.conf import settings
 from django_q.tasks import async_task
 
 from authn.models.session import Code
+from common.request import parse_ip_address, parse_useragent
 from notifications.email.users import send_auth_email
 from notifications.telegram.users import notify_user_auth
 from club.exceptions import AccessDenied
@@ -86,11 +88,18 @@ def activate_invite(request, invite_code):
     email = email.lower().strip()
 
     if request.me and request.me.email == email:
-        club_subscription_activator(PRODUCTS[invite.payment.product_code], invite.payment, request.me)
         now = datetime.utcnow()
-        invite.used_at = now
-        invite.invited_user = request.me
-        invite.save()
+        with transaction.atomic():
+            is_claimed = Invite.objects.filter(id=invite.id, used_at__isnull=True)\
+                .update(used_at=now, invited_user=request.me)
+            if not is_claimed:
+                return render(request, "error.html", {
+                    "title": "Этот инвайт-код уже использован 🥲",
+                    "message": "Возможно вы уже активировали его ранее? Проверьте свой профиль."
+                })
+
+            club_subscription_activator(PRODUCTS[invite.payment.product_code], invite.payment, request.me)
+
         return redirect(reverse("profile", args=[request.me.slug]))
 
     now = datetime.utcnow()
@@ -100,14 +109,20 @@ def activate_invite(request, invite_code):
             membership_platform_type=User.MEMBERSHIP_PLATFORM_DIRECT,
             full_name=email[:email.find("@")],
             membership_started_at=now,
-            membership_expires_at=now,
+            membership_expires_at=now + timedelta(days=1), # prevent "insufficient funds" error after redirect
             created_at=now,
             updated_at=now,
             moderation_status=User.MODERATION_STATUS_INTRO,
         ),
     )
 
-    code = Code.create_for_user(user=user, recipient=user.email, length=settings.AUTH_CODE_LENGTH)
+    code = Code.create_for_user(
+        user=user,
+        recipient=user.email,
+        length=settings.AUTH_CODE_LENGTH,
+        ipaddress=parse_ip_address(request),
+        useragent=parse_useragent(request),
+    )
     async_task(send_auth_email, user, code)
     async_task(notify_user_auth, user, code)
 
